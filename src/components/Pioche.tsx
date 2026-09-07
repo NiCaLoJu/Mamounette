@@ -24,7 +24,10 @@ export default function Pioche({ restantes }: { restantes: number }) {
 
   if (tiree) {
     return (
-      <article className="eclot border-bordure flex flex-col gap-3 rounded-3xl border bg-white p-5 shadow-sm">
+      <article
+        style={{ borderTopColor: tiree.auteur?.couleur ?? "#c96f8b" }}
+        className="eclot border-bordure flex flex-col gap-3 rounded-3xl border border-t-4 bg-white p-5 shadow-sm"
+      >
         <header className="flex items-baseline justify-between gap-2">
           <h2 className="titre text-xl">{tiree.titre ?? "Pour toi"}</h2>
           {tiree.auteur && (
@@ -82,7 +85,8 @@ export default function Pioche({ restantes }: { restantes: number }) {
     <button
       onClick={tirer}
       disabled={enCours}
-      className="bg-rose flex min-h-52 w-full flex-col items-center justify-center gap-3 rounded-3xl p-8 text-white shadow-sm transition active:scale-[0.98] disabled:opacity-60"
+      style={{ background: "linear-gradient(150deg, #e08aa4, #c96f8b 55%, #a8567a)" }}
+      className="flex min-h-52 w-full flex-col items-center justify-center gap-3 rounded-3xl p-8 text-white shadow-md transition active:scale-[0.98] disabled:opacity-60"
     >
       <span className="text-5xl">{enCours ? "✨" : "🎁"}</span>
       <span className="titre text-xl">{enCours ? "On regarde…" : "Pioche une surprise"}</span>

@@ -1,6 +1,7 @@
 import { frise, capsulesOuvertes } from "@/lib/donnees";
 import { aujourdhui, ecartJours, enCourt } from "@/lib/dates";
 import { EMOJIS_TYPE } from "@/lib/types";
+import { avecAlpha } from "@/lib/couleur";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,7 @@ export default async function Chemin() {
   return (
     <main className="px-4 pt-8">
       <header className="mb-6">
-        <h1 className="titre text-3xl">Le chemin</h1>
+        <h1 className="titre text-rose text-3xl">Le chemin</h1>
         <p className="text-encre-douce mt-1 text-sm">
           {franchies > 0
             ? `${franchies} étape${franchies > 1 ? "s" : ""} déjà derrière toi.`
@@ -27,9 +28,14 @@ export default async function Chemin() {
             <li
               key={etape.id}
               title={enCourt(etape.date)}
+              style={
+                passee
+                  ? { background: "linear-gradient(145deg, #f0c15c, #d9a441)" }
+                  : undefined
+              }
               className={`flex h-11 w-11 items-center justify-center rounded-full text-sm ${
                 passee
-                  ? "bg-or font-medium text-white shadow-sm"
+                  ? "font-medium text-white shadow-sm"
                   : "border-bordure text-encre-douce border border-dashed"
               }`}
             >
@@ -49,7 +55,11 @@ export default async function Chemin() {
           {ouvertes.map((capsule) => (
             <li
               key={capsule.id}
-              className="border-bordure flex items-center gap-3 rounded-2xl border bg-white px-3 py-2"
+              style={{
+                borderLeftColor: capsule.auteur?.couleur ?? "#c96f8b",
+                backgroundColor: avecAlpha(capsule.auteur?.couleur ?? "#c96f8b", 0.06),
+              }}
+              className="border-bordure flex items-center gap-3 rounded-2xl border border-l-4 px-3 py-2.5"
             >
               <span className="text-xl">{EMOJIS_TYPE[capsule.type]}</span>
               <span className="flex min-w-0 flex-1 flex-col">

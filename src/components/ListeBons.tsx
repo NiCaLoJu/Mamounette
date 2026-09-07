@@ -4,6 +4,7 @@ import { useTransition } from "react";
 import { reclamerBon } from "@/lib/actions";
 import type { Bon } from "@/lib/types";
 import type { Auteur } from "@/lib/donnees";
+import { avecAlpha } from "@/lib/couleur";
 
 export default function ListeBons({ bons }: { bons: (Bon & { auteur: Auteur | null })[] }) {
   const [enCours, demarrer] = useTransition();
@@ -21,7 +22,11 @@ export default function ListeBons({ bons }: { bons: (Bon & { auteur: Auteur | nu
       {bons.map((bon) => (
         <li
           key={bon.id}
-          className={`border-bordure rounded-3xl border bg-white p-4 ${
+          style={{
+            borderLeftColor: bon.auteur?.couleur ?? "#c96f8b",
+            backgroundColor: avecAlpha(bon.auteur?.couleur ?? "#c96f8b", 0.07),
+          }}
+          className={`border-bordure rounded-3xl border border-l-4 p-4 ${
             bon.etat === "honore" ? "opacity-50" : ""
           }`}
         >
@@ -45,7 +50,8 @@ export default function ListeBons({ bons }: { bons: (Bon & { auteur: Auteur | nu
             <button
               onClick={() => demarrer(() => void reclamerBon(bon.id))}
               disabled={enCours}
-              className="bg-rose w-full rounded-full py-2 text-sm text-white transition active:scale-[0.98] disabled:opacity-60"
+              style={{ backgroundColor: bon.auteur?.couleur ?? "#c96f8b" }}
+              className="w-full rounded-full py-2.5 text-sm text-white transition active:scale-[0.98] disabled:opacity-60"
             >
               Je le réclame
             </button>

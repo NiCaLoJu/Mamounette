@@ -31,10 +31,16 @@ export default function BarreOnglets({ garnis }: { garnis: Record<string, boolea
               <Link
                 href={onglet.href}
                 className={`flex min-h-14 flex-col items-center justify-center gap-0.5 text-[11px] no-underline transition ${
-                  actif ? "text-rose" : "text-encre-douce"
+                  actif ? "text-rose font-medium" : "text-encre-douce"
                 }`}
               >
-                <span className="text-xl">{onglet.emoji}</span>
+                <span
+                  className={`flex h-8 w-11 items-center justify-center rounded-full text-xl transition ${
+                    actif ? "bg-rose-clair" : ""
+                  }`}
+                >
+                  {onglet.emoji}
+                </span>
                 {onglet.libelle}
               </Link>
             </li>

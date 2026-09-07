@@ -9,7 +9,7 @@ export default async function PageProjets() {
   return (
     <main className="px-4 pt-8">
       <header className="mb-6">
-        <h1 className="titre text-3xl">La boîte à projets</h1>
+        <h1 className="titre text-rose text-3xl">La boîte à projets</h1>
         <p className="text-encre-douce mt-1 text-sm">
           Des choses à faire tous ensemble. Dis-nous celles qui te tentent.
         </p>

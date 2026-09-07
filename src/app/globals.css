@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --color-fond: #fdf8f4;
+  --color-fond: #fff9f4;
   --color-fond-carte: #ffffff;
   --color-encre: #3b3239;
   --color-encre-douce: #7a6b74;
@@ -10,7 +10,9 @@
   --color-or: #d9a441;
   --color-bordure: #ece0e5;
 
-  --font-titre: "Georgia", "Times New Roman", serif;
+  /* Iowan Old Style est livrée avec iOS : chaude, ronde, faite pour raconter.
+     Les autres appareils retombent sur Palatino puis Georgia. */
+  --font-titre: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
 }
 
 html {
@@ -39,7 +41,13 @@ select {
 }
 
 body {
-  background: var(--color-fond);
+  /* Trois halos très doux plutôt qu'un aplat : ça respire, sans distraire. */
+  background:
+    radial-gradient(60rem 30rem at 80% -10%, #ffe6ef 0%, transparent 60%),
+    radial-gradient(45rem 25rem at -10% 15%, #fff0d9 0%, transparent 55%),
+    radial-gradient(50rem 30rem at 50% 110%, #e8f3ee 0%, transparent 60%),
+    var(--color-fond);
+  background-attachment: fixed;
   color: var(--color-encre);
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   /* Le socle du harnais descend à 14 px ; c'est petit pour lire un souvenir
@@ -67,6 +75,20 @@ body {
   animation: eclosion 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
+/* Le petit sursaut d'un cœur qu'on vient de poser. */
+@keyframes battement {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+.bat {
+  animation: battement 320ms ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .eclot { animation: none; }
+  .eclot,
+  .bat {
+    animation: none;
+  }
 }

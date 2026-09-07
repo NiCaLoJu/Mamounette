@@ -9,7 +9,7 @@ export default async function PageBons() {
   return (
     <main className="px-4 pt-8">
       <header className="mb-6">
-        <h1 className="titre text-3xl">Bons pour…</h1>
+        <h1 className="titre text-rose text-3xl">Bons pour…</h1>
         <p className="text-encre-douce mt-1 text-sm">
           À réclamer quand tu veux. C'est fait pour ça.
         </p>

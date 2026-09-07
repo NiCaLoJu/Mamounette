@@ -4,6 +4,7 @@ import { useTransition } from "react";
 import { marquerEnvie } from "@/lib/actions";
 import type { Projet } from "@/lib/types";
 import type { Auteur } from "@/lib/donnees";
+import { avecAlpha } from "@/lib/couleur";
 
 type ProjetAffiche = Projet & { auteur: Auteur | null; media_url: string | null };
 
@@ -21,7 +22,11 @@ export default function ListeProjets({ projets }: { projets: ProjetAffiche[] }) 
   return (
     <ul className="flex flex-col gap-3">
       {projets.map((projet) => (
-        <li key={projet.id} className="border-bordure overflow-hidden rounded-3xl border bg-white">
+        <li
+          key={projet.id}
+          style={{ backgroundColor: avecAlpha(projet.auteur?.couleur ?? "#c96f8b", 0.07) }}
+          className="border-bordure overflow-hidden rounded-3xl border"
+        >
           {projet.media_url && (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img src={projet.media_url} alt={projet.titre} className="h-40 w-full object-cover" />

@@ -1,8 +1,10 @@
 import CaseAvent from "@/components/CaseAvent";
 import Notifications from "@/components/Notifications";
+import SignatureFamille from "@/components/SignatureFamille";
 import { capsulesDuJour, rendezVousDuJour, tailleReserve } from "@/lib/donnees";
 import { enLettres, aujourdhui } from "@/lib/dates";
 import { exigerMembre } from "@/lib/auth";
+import { salutation } from "@/lib/couleur";
 
 export const dynamic = "force-dynamic";
 
@@ -20,21 +22,21 @@ export default async function Aujourdhui() {
     <main className="px-4 pt-8">
       <header className="mb-6">
         <p className="text-encre-douce text-sm capitalize">{enLettres(aujourdhui())}</p>
-        <h1 className="titre text-3xl">
-          {capsules.length === 0
-            ? "Rien aujourd'hui"
-            : nonOuvertes > 0
-              ? "Il y a quelque chose pour toi"
-              : "Ta journée"}
+        <h1 className="titre text-rose text-3xl leading-tight">
+          {salutation()} Mamounette
         </h1>
-        {capsules.length > 0 && nonOuvertes > 0 && (
-          <p className="text-encre-douce mt-1 text-sm">
-            {nonOuvertes} case{nonOuvertes > 1 ? "s" : ""} à ouvrir — à ton rythme.
-          </p>
-        )}
+        <p className="mt-1">
+          {capsules.length === 0
+            ? "Rien de neuf aujourd'hui, mais on pense à toi."
+            : nonOuvertes > 0
+              ? `${nonOuvertes} case${nonOuvertes > 1 ? "s" : ""} t'attend${nonOuvertes > 1 ? "ent" : ""} — à ton rythme 💛`
+              : "Tu as tout ouvert. Reviens quand tu veux les relire."}
+        </p>
       </header>
 
       <Notifications />
+
+      {capsules.length > 0 && <SignatureFamille />}
 
       {capsules.length === 0 ? (
         <div className="border-bordure rounded-3xl border border-dashed p-8 text-center">

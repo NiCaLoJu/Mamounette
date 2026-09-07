@@ -11,7 +11,7 @@ export default async function Fil() {
   return (
     <main className="px-4 pt-8">
       <header className="mb-6">
-        <h1 className="titre text-3xl">Le fil</h1>
+        <h1 className="titre text-rose text-3xl">Le fil</h1>
         <p className="text-encre-douce mt-1 text-sm">
           Écris-leur quand tu veux, ou envoie ta voix. Ils reçoivent tout.
         </p>
