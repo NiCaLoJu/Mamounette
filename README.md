@@ -21,6 +21,10 @@ journée, et elles n'apparaissent jamais de son côté.
 - **La capsule.** Anecdote, photo, vocal, micro-vidéo, lien, quiz, triple
   témoignage, épisode de feuilleton : un seul objet en base, huit affichages.
   Ajouter un type ne casse rien.
+- **Le triple témoignage se joue à trois.** L'un lance la question avec sa
+  version, les deux autres sont prévenus, et la capsule reste au brouillon tant
+  qu'il manque une voix. L'application mélange ensuite les réponses et tient
+  elle-même la solution : personne n'a à écrire « qui est qui ».
 - **La réserve.** Des capsules sans date, déposées d'avance. Elles alimentent la
   pioche et **complètent automatiquement une journée trop maigre** — c'est le
   filet du projet : le vrai risque n'est pas technique, c'est qu'un jour arrive
@@ -41,6 +45,7 @@ Créer un projet (région Europe), puis exécuter dans l'éditeur SQL, dans l'or
 | `supabase/migrations/0003_seed.sql` | les cinq personnes et leurs liens secrets |
 | `supabase/migrations/0004_cron.sql` | la tâche planifiée (après le déploiement) |
 | `supabase/migrations/0005_media.sql` | les formats de fichiers que produisent les téléphones |
+| `supabase/migrations/0006_temoignages.sql` | le triple témoignage collaboratif |
 
 Récupérer ensuite les liens d'accès :
 
@@ -108,6 +113,7 @@ src/
     (maman)/          son application : aujourd'hui, pioche, chemin, bons, projets
     admin/            le tableau de bord des garçons
     admin/capsules/   la bibliothèque : relire, corriger, déplacer, supprimer
+    admin/temoignages/ les triples témoignages à compléter à trois
     api/taches/       la tâche planifiée (publication, filet, rappels)
     api/push/         l'enregistrement des appareils
     entree/[token]/   le lien secret

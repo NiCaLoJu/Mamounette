@@ -6,6 +6,7 @@ const LIENS = [
   { href: "/admin", libelle: "Tableau de bord" },
   { href: "/admin/deposer", libelle: "Déposer" },
   { href: "/admin/capsules", libelle: "Capsules" },
+  { href: "/admin/temoignages", libelle: "Témoignages" },
   { href: "/admin/calendrier", libelle: "Dates" },
   { href: "/admin/bons", libelle: "Bons" },
   { href: "/admin/projets", libelle: "Projets" },

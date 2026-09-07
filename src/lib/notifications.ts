@@ -20,7 +20,7 @@ function preparer(): boolean {
   return true;
 }
 
-type Options = { url?: string; destinataire?: string };
+type Options = { url?: string; destinataire?: string; sauf?: string };
 
 /** Envoie à tous les appareils d'un membre. Un abonnement mort est supprimé. */
 async function envoyerA(membreId: string, titre: string, corps: string, url = "/") {
@@ -103,9 +103,9 @@ export async function notifierEnfants(titre: string, corps: string, options: Opt
   const { data: enfants } = await db().from("membres").select("id").eq("role", "enfant");
 
   await Promise.all(
-    (enfants ?? []).map((e) =>
-      envoyerA(e.id as string, titre, corps, options.url ?? "/admin"),
-    ),
+    (enfants ?? [])
+      .filter((e) => e.id !== options.sauf)
+      .map((e) => envoyerA(e.id as string, titre, corps, options.url ?? "/admin")),
   );
 }
 

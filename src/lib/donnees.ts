@@ -3,13 +3,22 @@ import { aujourdhui } from "./dates";
 import type { Bon, Capsule, Projet, RendezVous } from "./types";
 
 export type Auteur = { prenom: string; couleur: string };
+export type Temoignage = {
+  id: string;
+  texte: string;
+  auteur_id: string;
+  auteur: Auteur | null;
+};
+
 export type CapsuleAffichee = Capsule & {
   auteur: Auteur | null;
   media_url: string | null;
   reactions: { emoji: string | null }[];
+  temoignages: Temoignage[];
 };
 
-const CHAMPS = "*, auteur:membres(prenom, couleur), reactions(emoji)";
+const CHAMPS =
+  "*, auteur:membres(prenom, couleur), reactions(emoji), temoignages(id, texte, auteur_id, auteur:membres(prenom, couleur))";
 
 /** Ajoute les URLs signées des médias à un lot de capsules. */
 async function avecMedias(lignes: CapsuleAffichee[]): Promise<CapsuleAffichee[]> {
@@ -228,4 +237,73 @@ export async function capsulesFiltrees(
 
   const { data } = await requete.order("cree_le", { ascending: false }).limit(limite);
   return avecMedias((data ?? []) as CapsuleAffichee[]);
+}
+
+// ---------------------------------------------------------------------------
+// Le triple témoignage collaboratif
+// ---------------------------------------------------------------------------
+
+export type TemoignageEnCours = CapsuleAffichee & {
+  question: string;
+  manquants: string[];
+  aRepondu: boolean;
+};
+
+/** Qui doit répondre pour qu'un témoignage soit complet. */
+async function participants(): Promise<{ id: string; prenom: string }[]> {
+  const { data } = await db()
+    .from("membres")
+    .select("id, prenom")
+    .eq("role", "enfant")
+    .eq("attendu_temoignages", true)
+    .eq("actif", true);
+  return (data ?? []) as { id: string; prenom: string }[];
+}
+
+/**
+ * Les témoignages encore au brouillon, avec qui manque à l'appel.
+ * Ceux qui attendent ta réponse remontent en premier.
+ */
+export async function temoignagesEnCours(membreId: string): Promise<TemoignageEnCours[]> {
+  const [{ data }, attendus] = await Promise.all([
+    db()
+      .from("capsules")
+      .select(CHAMPS)
+      .eq("type", "temoignage")
+      .eq("etat", "brouillon")
+      .order("cree_le", { ascending: false }),
+    participants(),
+  ]);
+
+  const capsules = (data ?? []) as CapsuleAffichee[];
+
+  const { data: reponses } = await db()
+    .from("temoignages")
+    .select("capsule_id, auteur_id")
+    .in("capsule_id", capsules.length ? capsules.map((c) => c.id) : ["-"]);
+
+  const parCapsule = new Map<string, Set<string>>();
+  for (const r of reponses ?? []) {
+    const cle = r.capsule_id as string;
+    if (!parCapsule.has(cle)) parCapsule.set(cle, new Set());
+    parCapsule.get(cle)!.add(r.auteur_id as string);
+  }
+
+  return capsules
+    .map((capsule) => {
+      const ontRepondu = parCapsule.get(capsule.id) ?? new Set<string>();
+      return {
+        ...capsule,
+        question: (capsule.payload?.question as string) ?? "Sans question",
+        manquants: attendus.filter((p) => !ontRepondu.has(p.id)).map((p) => p.prenom),
+        aRepondu: ontRepondu.has(membreId),
+      };
+    })
+    .sort((a, b) => Number(a.aRepondu) - Number(b.aRepondu));
+}
+
+/** Combien attendent ta réponse — pour la pastille du tableau de bord. */
+export async function temoignagesAttendus(membreId: string): Promise<number> {
+  const enCours = await temoignagesEnCours(membreId);
+  return enCours.filter((t) => !t.aRepondu).length;
 }

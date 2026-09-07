@@ -153,10 +153,12 @@ export async function creerCapsule(formulaire: FormData) {
     }
   }
 
-  const publieeImmediatement = destination === "direct";
+  // Un triple témoignage naît incomplet : il attend la voix des deux autres.
+  const collaboratif = type === "temoignage";
+  const publieeImmediatement = destination === "direct" && !collaboratif;
   const maintenant = new Date().toISOString();
 
-  const { error } = await db()
+  const { data: creee, error } = await db()
     .from("capsules")
     .insert({
       type,
@@ -170,11 +172,29 @@ export async function creerCapsule(formulaire: FormData) {
       payload,
       destination,
       rendezvous_id: destination === "rendezvous" ? rendezvousId : null,
-      etat: publieeImmediatement ? "publiee" : "programmee",
+      etat: collaboratif ? "brouillon" : publieeImmediatement ? "publiee" : "programmee",
       publiee_le: publieeImmediatement ? maintenant : null,
-    });
+    })
+    .select("id")
+    .single();
 
-  if (error) throw new Error(error.message);
+  if (error || !creee) throw new Error(error?.message ?? "Dépôt impossible.");
+
+  // Celui qui lance donne sa version tout de suite, puis prévient les autres.
+  if (collaboratif) {
+    const maReponse = (formulaire.get("ma_reponse") as string)?.trim();
+    if (maReponse) {
+      await db()
+        .from("temoignages")
+        .insert({ capsule_id: creee.id, auteur_id: auteur.id, texte: maReponse });
+    }
+
+    await notifierEnfants(
+      "🕵️ À toi de répondre",
+      `${auteur.prenom} lance : « ${payload.question ?? "un témoignage"} »`,
+      { sauf: auteur.id, url: "/admin/temoignages" },
+    );
+  }
 
   if (publieeImmediatement) {
     await notifierMaman(
@@ -369,4 +389,82 @@ export async function annulerRappel(id: string) {
   await exigerEnfant();
   await db().from("rappels").delete().eq("id", id).is("envoye_le", null);
   revalidatePath("/admin/rappels");
+}
+
+// ---------------------------------------------------------------------------
+// Le triple témoignage collaboratif
+// ---------------------------------------------------------------------------
+
+/**
+ * Ajouter sa version. Quand les trois voix y sont, la capsule quitte le
+ * brouillon toute seule et rejoint la file d'attente.
+ */
+export async function repondreTemoignage(capsuleId: string, texte: string) {
+  const auteur = await exigerEnfant();
+  const propre = texte.trim();
+  if (!propre) return;
+
+  const { error } = await db()
+    .from("temoignages")
+    .upsert(
+      { capsule_id: capsuleId, auteur_id: auteur.id, texte: propre },
+      { onConflict: "capsule_id,auteur_id" },
+    );
+
+  if (error) throw new Error(error.message);
+
+  const { data: capsule } = await db()
+    .from("capsules")
+    .select("id, etat, destination, teaser, payload")
+    .eq("id", capsuleId)
+    .maybeSingle();
+
+  if (!capsule || capsule.etat !== "brouillon") return;
+
+  const [{ data: attendus }, { data: reponses }] = await Promise.all([
+    db()
+      .from("membres")
+      .select("id")
+      .eq("role", "enfant")
+      .eq("attendu_temoignages", true)
+      .eq("actif", true),
+    db().from("temoignages").select("auteur_id").eq("capsule_id", capsuleId),
+  ]);
+
+  const ontRepondu = new Set((reponses ?? []).map((r) => r.auteur_id as string));
+  const complet = (attendus ?? []).every((m) => ontRepondu.has(m.id as string));
+
+  if (complet) {
+    const direct = capsule.destination === "direct";
+    const maintenant = new Date().toISOString();
+
+    await db()
+      .from("capsules")
+      .update({
+        etat: direct ? "publiee" : "programmee",
+        publiee_le: direct ? maintenant : null,
+      })
+      .eq("id", capsuleId);
+
+    await notifierEnfants(
+      "✅ Témoignage complet",
+      `« ${(capsule.payload as Record<string, unknown>)?.question ?? "Le témoignage"} » est prêt.`,
+      { url: "/admin/capsules" },
+    );
+
+    if (direct) {
+      await notifierMaman(
+        "Un mot pour toi 💌",
+        (capsule.teaser as string) || "Trois versions t'attendent.",
+      );
+    }
+  } else {
+    await notifierEnfants("🕵️ Une voix de plus", `${auteur.prenom} a donné sa version.`, {
+      sauf: auteur.id,
+      url: "/admin/temoignages",
+    });
+  }
+
+  revalidatePath("/admin/temoignages");
+  revalidatePath("/admin");
 }

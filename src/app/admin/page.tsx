@@ -3,8 +3,10 @@ import {
   dernieresReactions,
   prochainsRendezVous,
   tailleReserve,
+  temoignagesAttendus,
   toutesLesCapsules,
 } from "@/lib/donnees";
+import { exigerEnfant } from "@/lib/auth";
 import { aujourdhui, ecartJours, enLettres, enRelatif } from "@/lib/dates";
 import { EMOJIS_TYPE } from "@/lib/types";
 import Notifications from "@/components/Notifications";
@@ -14,11 +16,13 @@ export const dynamic = "force-dynamic";
 const CAPSULES_MINIMUM = 3;
 
 export default async function TableauDeBord() {
-  const [rdvs, reserve, capsules, reactions] = await Promise.all([
+  const moi = await exigerEnfant();
+  const [rdvs, reserve, capsules, reactions, temoignages] = await Promise.all([
     prochainsRendezVous(4),
     tailleReserve(),
     toutesLesCapsules(12),
     dernieresReactions(6),
+    temoignagesAttendus(moi.id),
   ]);
 
   const prochain = rdvs[0];
@@ -28,6 +32,22 @@ export default async function TableauDeBord() {
   return (
     <main className="flex flex-col gap-6">
       <Notifications />
+
+      {/* Ce que les autres attendent de toi passe avant tout le reste. */}
+      {temoignages > 0 && (
+        <Link
+          href="/admin/temoignages"
+          className="border-rose bg-rose-clair rounded-3xl border p-4 text-sm no-underline"
+        >
+          <strong>
+            🕵️ {temoignages} témoignage{temoignages > 1 ? "s" : ""} attend
+            {temoignages > 1 ? "ent" : ""} ta version.
+          </strong>
+          <span className="text-encre-douce block">
+            Sans toi, la capsule reste au brouillon et elle ne la verra jamais.
+          </span>
+        </Link>
+      )}
 
       {/* Le prochain rendez-vous — c'est tout l'objet de cette page. */}
       <section

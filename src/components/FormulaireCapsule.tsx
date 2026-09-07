@@ -54,8 +54,6 @@ export default function FormulaireCapsule({
 
   // Quiz
   const [choix, setChoix] = useState<string[]>(troisChamps(capsule?.payload?.choix));
-  // Triple témoignage
-  const [reponses, setReponses] = useState<string[]>(troisChamps(capsule?.payload?.reponses));
 
   function construirePayload(formulaire: FormData): string {
     if (type === "quiz") {
@@ -66,11 +64,7 @@ export default function FormulaireCapsule({
       });
     }
     if (type === "temoignage") {
-      return JSON.stringify({
-        question: formulaire.get("question"),
-        reponses: reponses.filter(Boolean),
-        solution: formulaire.get("solution"),
-      });
+      return JSON.stringify({ question: formulaire.get("question") });
     }
     return "{}";
   }
@@ -276,30 +270,39 @@ export default function FormulaireCapsule({
         <div className="flex flex-col gap-3">
           <input
             name="question"
+            required
             defaultValue={(capsule?.payload?.question as string) ?? ""}
             className={champ}
             placeholder="Le pire plat que maman nous ait fait avaler"
           />
-          {reponses.map((valeur, i) => (
-            <textarea
-              key={i}
-              value={valeur}
-              onChange={(e) => {
-                const copie = [...reponses];
-                copie[i] = e.target.value;
-                setReponses(copie);
-              }}
-              rows={2}
-              className={champ}
-              placeholder={`Réponse anonyme ${i + 1}`}
-            />
-          ))}
-          <input
-            name="solution"
-            defaultValue={(capsule?.payload?.solution as string) ?? ""}
-            className={champ}
-            placeholder="Qui est qui (elle le découvre après)"
-          />
+
+          {modification ? (
+            <p className="border-bordure rounded-2xl border border-dashed p-4 text-sm">
+              Les trois versions se complètent depuis{" "}
+              <a href="/admin/temoignages" className="underline">
+                Témoignages
+              </a>
+              .
+            </p>
+          ) : (
+            <>
+              <label className="flex flex-col gap-1.5">
+                <span className="text-encre-douce text-sm">Ta version</span>
+                <textarea
+                  name="ma_reponse"
+                  required
+                  rows={3}
+                  className={champ}
+                  placeholder="Raconte la tienne…"
+                />
+              </label>
+              <p className="bg-rose-clair rounded-2xl p-3 text-sm">
+                Foufou et Loulou seront prévenus tout de suite. La capsule reste au brouillon
+                jusqu'à ce que vous ayez répondu tous les trois — et c'est l'application qui
+                mélangera vos réponses.
+              </p>
+            </>
+          )}
         </div>
       )}
 

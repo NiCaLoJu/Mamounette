@@ -28,7 +28,7 @@ export default function ContenuCapsule({ capsule }: { capsule: CapsuleAffichee }
 
       {type === "quiz" && <Quiz payload={payload} />}
 
-      {type === "temoignage" && <Temoignages payload={payload} />}
+      {type === "temoignage" && <Temoignages capsule={capsule} />}
 
       {corps && <p className="whitespace-pre-wrap leading-relaxed">{corps}</p>}
     </div>
@@ -95,31 +95,49 @@ function Quiz({ payload }: { payload: Record<string, unknown> }) {
   );
 }
 
-function Temoignages({ payload }: { payload: Record<string, unknown> }) {
-  const question = payload.question as string | undefined;
-  const reponses = (payload.reponses as string[] | undefined) ?? [];
-  const solution = payload.solution as string | undefined;
+/**
+ * Trois versions de la même histoire, dans un ordre qui ne trahit personne :
+ * mélangées à partir de leur identifiant, donc stable d'une visite à l'autre
+ * mais sans rapport avec l'ordre dans lequel les garçons ont répondu.
+ */
+function Temoignages({ capsule }: { capsule: CapsuleAffichee }) {
+  const question = capsule.payload?.question as string | undefined;
+  const voix = [...(capsule.temoignages ?? [])].sort((a, b) => melange(a.id) - melange(b.id));
 
-  if (!question) return null;
+  if (!question || voix.length === 0) return null;
 
   return (
     <div className="flex flex-col gap-3">
       <p className="font-medium">{question}</p>
-      <p className="text-encre-douce text-sm">Trois réponses. À toi de deviner qui a dit quoi.</p>
-      {reponses.map((r, i) => (
-        <blockquote
-          key={i}
-          className="border-rose border-l-2 bg-white/70 py-2 pl-3 text-sm italic"
-        >
-          {r}
+      <p className="text-encre-douce text-sm">
+        {voix.length} réponses. À toi de deviner qui a dit quoi.
+      </p>
+
+      {voix.map((v, i) => (
+        <blockquote key={v.id} className="border-rose border-l-2 bg-white/70 py-2 pl-3 text-sm">
+          <span className="text-encre-douce mr-2 text-xs">n° {i + 1}</span>
+          <span className="italic">{v.texte}</span>
         </blockquote>
       ))}
-      {solution && (
-        <details>
-          <summary className="text-encre-douce cursor-pointer text-sm">Qui est qui ?</summary>
-          <p className="mt-2 text-sm">{solution}</p>
-        </details>
-      )}
+
+      <details>
+        <summary className="text-encre-douce cursor-pointer text-sm">Qui est qui ?</summary>
+        <ul className="mt-2 flex flex-col gap-1 text-sm">
+          {voix.map((v, i) => (
+            <li key={v.id}>
+              <span className="text-encre-douce">n° {i + 1} —</span>{" "}
+              <strong>{v.auteur?.prenom ?? "?"}</strong>
+            </li>
+          ))}
+        </ul>
+      </details>
     </div>
   );
+}
+
+/** Un petit brassage déterministe à partir de l'identifiant. */
+function melange(id: string): number {
+  let valeur = 0;
+  for (const caractere of id) valeur = (valeur * 31 + caractere.charCodeAt(0)) % 100_000;
+  return valeur;
 }
