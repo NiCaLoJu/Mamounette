@@ -7,7 +7,7 @@ const ONGLETS = [
   { href: "/", libelle: "Aujourd'hui", emoji: "💌" },
   { href: "/fil", libelle: "Le fil", emoji: "💬" },
   { href: "/pioche", libelle: "Pioche", emoji: "🎁" },
-  { href: "/chemin", libelle: "Chemin", emoji: "✨" },
+  { href: "/tresors", libelle: "Mes trésors", emoji: "💎" },
   { href: "/bons", libelle: "Bons", emoji: "🎟️" },
   { href: "/projets", libelle: "Projets", emoji: "🌍" },
 ];

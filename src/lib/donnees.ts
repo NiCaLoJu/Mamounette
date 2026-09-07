@@ -412,7 +412,7 @@ export async function ongletsGarnis(): Promise<Record<string, boolean>> {
 
   return {
     "/pioche": reserve > 0,
-    "/chemin": dates || (ouvertes.count ?? 0) > 0,
+    "/tresors": dates || (ouvertes.count ?? 0) > 0,
     "/bons": lesBons,
     "/projets": lesProjets,
   };

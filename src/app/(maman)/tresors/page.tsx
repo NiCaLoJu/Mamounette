@@ -5,7 +5,7 @@ import { avecAlpha } from "@/lib/couleur";
 
 export const dynamic = "force-dynamic";
 
-export default async function Chemin() {
+export default async function Tresors() {
   const [etapes, ouvertes] = await Promise.all([frise(), capsulesOuvertes(60)]);
   const jour = aujourdhui();
   const franchies = etapes.filter((e) => ecartJours(jour, e.date) <= 0).length;
@@ -13,11 +13,11 @@ export default async function Chemin() {
   return (
     <main className="px-4 pt-8">
       <header className="mb-6">
-        <h1 className="titre text-rose text-3xl">Le chemin</h1>
-        <p className="text-encre-douce mt-1 text-sm">
+        <h1 className="titre text-rose text-3xl">Mes trésors</h1>
+        <p className="mt-1">
           {franchies > 0
-            ? `${franchies} étape${franchies > 1 ? "s" : ""} déjà derrière toi.`
-            : "Chaque étape laissera une trace ici."}
+            ? `${franchies} étoile${franchies > 1 ? "s" : ""} déjà gagnée${franchies > 1 ? "s" : ""} ✨`
+            : "Tout ce que tu ouvriras se gardera ici."}
         </p>
       </header>
 
@@ -48,7 +48,8 @@ export default async function Chemin() {
       <h2 className="titre mb-3 text-xl">Ta collection</h2>
       {ouvertes.length === 0 ? (
         <p className="text-encre-douce text-sm">
-          Tout ce que tu ouvriras se rangera ici, pour y revenir quand tu veux.
+          Rien encore. Chaque case ouverte viendra se ranger ici, pour que tu puisses y revenir
+          quand tu veux.
         </p>
       ) : (
         <ul className="flex flex-col gap-2">
