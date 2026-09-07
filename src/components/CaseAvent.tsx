@@ -41,7 +41,8 @@ export default function CaseAvent({
       >
         <span className="text-3xl">{EMOJIS_TYPE[capsule.type]}</span>
         <span className="text-encre-douce text-sm leading-snug">
-          {capsule.teaser ?? "Une surprise"}
+          {/* `teaser` ne sert plus qu'aux quelques capsules d'avant. */}
+          {capsule.titre ?? capsule.teaser ?? "Une surprise"}
         </span>
       </button>
     );

@@ -146,25 +146,16 @@ export default function FormulaireCapsule({
       </fieldset>
 
       <label className="flex flex-col gap-1.5">
-        <span className="text-encre-douce text-sm">Titre</span>
-        <input
-          name="titre"
-          defaultValue={capsule?.titre ?? ""}
-          className={champ}
-          placeholder="Le jour où papa a repeint le chat"
-        />
-      </label>
-
-      <label className="flex flex-col gap-1.5">
         <span className="text-encre-douce text-sm">
-          L'étiquette sur la case fermée <em>— ce qu'elle lit avant d'ouvrir</em>
+          Titre <em>— c'est ce qu'elle lit sur la case fermée</em>
         </span>
         <input
-          name="teaser"
-          defaultValue={capsule?.teaser ?? ""}
+          name="titre"
+          required
+          maxLength={70}
+          defaultValue={capsule?.titre ?? capsule?.teaser ?? ""}
           className={champ}
-          placeholder="Une bêtise de 2005"
-          maxLength={60}
+          placeholder="Le jour où papa a repeint le chat"
         />
       </label>
 

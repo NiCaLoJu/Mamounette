@@ -164,7 +164,6 @@ export async function creerCapsule(formulaire: FormData) {
       type,
       auteur_id: auteur.id,
       titre: (formulaire.get("titre") as string) || null,
-      teaser: (formulaire.get("teaser") as string) || null,
       corps: (formulaire.get("corps") as string) || null,
       lien_url: (formulaire.get("lien_url") as string) || null,
       media_chemin: (formulaire.get("media_chemin") as string) || null,
@@ -199,7 +198,7 @@ export async function creerCapsule(formulaire: FormData) {
   if (publieeImmediatement) {
     await notifierMaman(
       "Un mot pour toi 💌",
-      (formulaire.get("teaser") as string) || "Quelqu'un vient de déposer quelque chose.",
+      (formulaire.get("titre") as string) || "Quelqu'un vient de déposer quelque chose.",
     );
   }
 
@@ -273,7 +272,6 @@ export async function modifierCapsule(formulaire: FormData) {
     .from("capsules")
     .update({
       titre: (formulaire.get("titre") as string) || null,
-      teaser: (formulaire.get("teaser") as string) || null,
       corps: (formulaire.get("corps") as string) || null,
       lien_url: (formulaire.get("lien_url") as string) || null,
       ...(nouveauMedia ? { media_chemin: nouveauMedia } : {}),
@@ -294,7 +292,7 @@ export async function modifierCapsule(formulaire: FormData) {
   if (!dejaPubliee && destination === "direct") {
     await notifierMaman(
       "Un mot pour toi 💌",
-      (formulaire.get("teaser") as string) || "Quelqu'un vient de déposer quelque chose.",
+      (formulaire.get("titre") as string) || "Quelqu'un vient de déposer quelque chose.",
     );
   }
 
@@ -415,7 +413,7 @@ export async function repondreTemoignage(capsuleId: string, texte: string) {
 
   const { data: capsule } = await db()
     .from("capsules")
-    .select("id, etat, destination, teaser, payload")
+    .select("id, etat, destination, payload")
     .eq("id", capsuleId)
     .maybeSingle();
 
@@ -453,10 +451,7 @@ export async function repondreTemoignage(capsuleId: string, texte: string) {
     );
 
     if (direct) {
-      await notifierMaman(
-        "Un mot pour toi 💌",
-        (capsule.teaser as string) || "Trois versions t'attendent.",
-      );
+      await notifierMaman("Un mot pour toi 💌", "Trois versions t'attendent.");
     }
   } else {
     await notifierEnfants("🕵️ Une voix de plus", `${auteur.prenom} a donné sa version.`, {
