@@ -1,4 +1,5 @@
 import FormulaireCapsule from "@/components/FormulaireCapsule";
+import EnteteSection from "@/components/EnteteSection";
 import { prochainsRendezVous } from "@/lib/donnees";
 import { enLettres } from "@/lib/dates";
 import type { TypeCapsule } from "@/lib/types";
@@ -14,10 +15,12 @@ export default async function Deposer({
 
   return (
     <main>
-      <h1 className="titre mb-1 text-2xl">Déposer une capsule</h1>
-      <p className="text-encre-douce mb-6 text-sm">
-        Le plus court est souvent le meilleur : une photo brute, un vocal de dix secondes.
-      </p>
+      <EnteteSection
+        emoji="✨"
+        titre="Déposer une capsule"
+        description="Le plus court est souvent le meilleur : une photo brute, un vocal de dix secondes."
+        teinte="rose"
+      />
 
       <FormulaireCapsule
         typeInitial={type as TypeCapsule | undefined}

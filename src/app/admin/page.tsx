@@ -11,6 +11,7 @@ import { exigerEnfant } from "@/lib/auth";
 import { aujourdhui, ecartJours, enLettres, enRelatif } from "@/lib/dates";
 import { EMOJIS_TYPE } from "@/lib/types";
 import Notifications from "@/components/Notifications";
+import { TEINTES } from "@/lib/sections";
 
 export const dynamic = "force-dynamic";
 
@@ -38,14 +39,19 @@ export default async function TableauDeBord() {
       {/* Déposer doit tenir en deux gestes, debout dans le métro. */}
       <nav className="grid grid-cols-3 gap-2">
         {[
-          { type: "photo", emoji: "📷", libelle: "Photo" },
-          { type: "vocal", emoji: "🎙️", libelle: "Vocal" },
-          { type: "anecdote", emoji: "✏️", libelle: "Un mot" },
+          { type: "photo", emoji: "📷", libelle: "Photo", teinte: "lilas" as const },
+          { type: "vocal", emoji: "🎙️", libelle: "Vocal", teinte: "menthe" as const },
+          { type: "anecdote", emoji: "✏️", libelle: "Un mot", teinte: "sable" as const },
         ].map((raccourci) => (
           <Link
             key={raccourci.type}
             href={`/admin/deposer?type=${raccourci.type}`}
-            className="border-bordure flex min-h-20 flex-col items-center justify-center gap-1 rounded-2xl border bg-white text-sm no-underline transition active:scale-[0.97]"
+            style={{
+              backgroundColor: TEINTES[raccourci.teinte].fond,
+              borderColor: TEINTES[raccourci.teinte].bordure,
+              color: TEINTES[raccourci.teinte].encre,
+            }}
+            className="flex min-h-20 flex-col items-center justify-center gap-1 rounded-2xl border text-sm font-medium no-underline transition active:scale-[0.97]"
           >
             <span className="text-2xl">{raccourci.emoji}</span>
             {raccourci.libelle}
@@ -56,12 +62,17 @@ export default async function TableauDeBord() {
       {nonLus > 0 && (
         <Link
           href="/admin/fil"
-          className="border-rose bg-rose-clair rounded-3xl border p-4 text-sm no-underline"
+          style={{
+            backgroundColor: TEINTES.ciel.fond,
+            borderColor: TEINTES.ciel.encre,
+            color: TEINTES.ciel.encre,
+          }}
+          className="rounded-3xl border p-4 text-sm no-underline"
         >
           <strong>
             💬 Maman a écrit {nonLus} message{nonLus > 1 ? "s" : ""}.
           </strong>
-          <span className="text-encre-douce block">Va lui répondre.</span>
+          <span className="block opacity-80">Va lui répondre.</span>
         </Link>
       )}
 
@@ -69,13 +80,18 @@ export default async function TableauDeBord() {
       {temoignages > 0 && (
         <Link
           href="/admin/temoignages"
-          className="border-rose bg-rose-clair rounded-3xl border p-4 text-sm no-underline"
+          style={{
+            backgroundColor: TEINTES.menthe.fond,
+            borderColor: TEINTES.menthe.encre,
+            color: TEINTES.menthe.encre,
+          }}
+          className="rounded-3xl border p-4 text-sm no-underline"
         >
           <strong>
             🕵️ {temoignages} témoignage{temoignages > 1 ? "s" : ""} attend
             {temoignages > 1 ? "ent" : ""} ta version.
           </strong>
-          <span className="text-encre-douce block">
+          <span className="block opacity-80">
             Sans toi, la capsule reste au brouillon et elle ne la verra jamais.
           </span>
         </Link>
@@ -83,13 +99,16 @@ export default async function TableauDeBord() {
 
       {/* Le prochain rendez-vous — c'est tout l'objet de cette page. */}
       <section
-        className={`rounded-3xl border p-5 ${
-          alerte ? "border-rose bg-rose-clair" : "border-bordure bg-white"
-        }`}
+        style={{
+          backgroundColor: alerte ? TEINTES.corail.fond : TEINTES.sable.fond,
+          borderColor: alerte ? TEINTES.corail.encre : TEINTES.sable.bordure,
+          color: alerte ? TEINTES.corail.encre : TEINTES.sable.encre,
+        }}
+        className="rounded-3xl border p-5"
       >
         {prochain ? (
           <>
-            <p className="text-encre-douce text-sm">Prochaine date · {enRelatif(prochain.date)}</p>
+            <p className="text-sm opacity-75">Prochaine date · {enRelatif(prochain.date)}</p>
             <h2 className="titre text-2xl capitalize">{enLettres(prochain.date)}</h2>
             <p className="mt-2 text-sm">
               <strong>{prochain.capsules}</strong> capsule{prochain.capsules > 1 ? "s" : ""} prête
@@ -111,7 +130,7 @@ export default async function TableauDeBord() {
         ) : (
           <>
             <h2 className="titre text-xl">Aucune date enregistrée</h2>
-            <p className="text-encre-douce mt-1 text-sm">
+            <p className="mt-1 text-sm opacity-75">
               Commence par ajouter les prochains rendez-vous.
             </p>
             <Link
@@ -127,10 +146,15 @@ export default async function TableauDeBord() {
       {/* La réserve : le filet de sécurité du projet. */}
       <Link
         href="/admin/capsules?filtre=reserve"
-        className="border-bordure rounded-3xl border bg-white p-5 no-underline"
+        style={{
+          backgroundColor: TEINTES.lilas.fond,
+          borderColor: TEINTES.lilas.bordure,
+          color: TEINTES.lilas.encre,
+        }}
+        className="rounded-3xl border p-5 no-underline"
       >
         <h2 className="titre mb-1 text-xl">La réserve</h2>
-        <p className="text-encre-douce text-sm">
+        <p className="text-sm opacity-85">
           {reserve === 0 ? (
             <>
               Elle est vide. C'est le point faible du projet : sans réserve, un jour sans dépôt est

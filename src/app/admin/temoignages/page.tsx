@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ListeTemoignages from "@/components/ListeTemoignages";
+import EnteteSection from "@/components/EnteteSection";
 import { exigerEnfant } from "@/lib/auth";
 import { temoignagesEnCours } from "@/lib/donnees";
 
@@ -12,14 +13,16 @@ export default async function Temoignages() {
 
   return (
     <main className="flex flex-col gap-5">
-      <div>
-        <h1 className="titre mb-1 text-2xl">Les triples témoignages</h1>
-        <p className="text-encre-douce text-sm">
-          {aCompleter > 0
+      <EnteteSection
+        emoji="🕵️"
+        titre="Les triples témoignages"
+        description={
+          aCompleter > 0
             ? `${aCompleter} attend${aCompleter > 1 ? "ent" : ""} ta version.`
-            : "Trois versions de la même histoire. Elle devine qui a dit quoi."}
-        </p>
-      </div>
+            : "Trois versions de la même histoire. Elle devine qui a dit quoi."
+        }
+        teinte="menthe"
+      />
 
       <ListeTemoignages temoignages={enCours} moi={moi.id} />
 

@@ -5,6 +5,7 @@ import BoutonSupprimer from "@/components/BoutonSupprimer";
 import { capsule as chargerCapsule, prochainsRendezVous } from "@/lib/donnees";
 import { enLettres } from "@/lib/dates";
 import { LIBELLES_TYPE } from "@/lib/types";
+import { TEINTES } from "@/lib/sections";
 
 export const dynamic = "force-dynamic";
 
@@ -20,14 +21,21 @@ export default async function ModifierCapsule({
 
   return (
     <main className="flex flex-col gap-5">
-      <div>
-        <Link href="/admin/capsules" className="text-encre-douce text-sm no-underline">
+      <div
+        style={{ backgroundColor: TEINTES.lilas.fond, borderColor: TEINTES.lilas.bordure }}
+        className="rounded-3xl border p-5"
+      >
+        <Link
+          href="/admin/capsules"
+          className="text-sm no-underline"
+          style={{ color: TEINTES.lilas.encre, opacity: 0.8 }}
+        >
           ← Toutes les capsules
         </Link>
-        <h1 className="titre mt-2 text-2xl">
+        <h1 className="titre mt-2 text-2xl" style={{ color: TEINTES.lilas.encre }}>
           {capsule.titre ?? `${LIBELLES_TYPE[capsule.type]} sans titre`}
         </h1>
-        <p className="text-encre-douce text-sm">
+        <p className="text-sm" style={{ color: TEINTES.lilas.encre, opacity: 0.8 }}>
           Déposée par {capsule.auteur?.prenom}
           {capsule.ouverte_le && " · elle l'a déjà ouverte"}
         </p>

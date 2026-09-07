@@ -1,3 +1,4 @@
+import EnteteSection from "@/components/EnteteSection";
 import { annulerRappel, programmerRappel } from "@/lib/actions";
 import { membres, rappelsAVenir } from "@/lib/donnees";
 
@@ -9,13 +10,12 @@ export default async function Rappels() {
 
   return (
     <main className="flex flex-col gap-6">
-      <div>
-        <h1 className="titre mb-1 text-2xl">Rappels programmés</h1>
-        <p className="text-encre-douce text-sm">
-          Un mot qui arrive un mardi soir sans raison. Attention quand même : une seule notification
-          par jour lui parvient, c'est volontaire.
-        </p>
-      </div>
+      <EnteteSection
+        emoji="⏰"
+        titre="Rappels programmés"
+        description="Un mot qui arrive un mardi soir sans raison. Une seule notification automatique par jour lui parvient, c'est volontaire."
+        teinte="prune"
+      />
 
       <form
         action={programmerRappel}

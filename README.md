@@ -89,6 +89,18 @@ que maman la voit via « Voir comme maman ».
 Déployer sur Vercel (offre Hobby), reporter les mêmes variables
 d'environnement, puis exécuter `0004_cron.sql` avec le domaine réel.
 
+## Une couleur par rubrique
+
+Chaque rubrique de l'admin a sa teinte pastel, définie une seule fois dans
+`src/lib/sections.ts` : le menu, l'en-tête de la page et ses encadrés la
+partagent. On sait où on est avant d'avoir lu le titre, et le tableau de bord
+signale par la couleur ce qui appelle une action — corail quand une journée
+manque de contenu, menthe quand un témoignage attend une voix, ciel quand elle
+a écrit.
+
+Son application à elle garde sa palette douce et unique : la couleur sert à
+s'orienter dans un outil, pas dans un cadeau.
+
 ## L'iPhone comme terrain principal
 
 Tout est pensé pour un pouce, sur un écran de téléphone.

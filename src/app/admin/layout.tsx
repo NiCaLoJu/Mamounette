@@ -1,18 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { membreCourant } from "@/lib/auth";
+import NavAdmin from "@/components/NavAdmin";
 
-const LIENS = [
-  { href: "/admin", libelle: "Tableau de bord" },
-  { href: "/admin/deposer", libelle: "Déposer" },
-  { href: "/admin/capsules", libelle: "Capsules" },
-  { href: "/admin/temoignages", libelle: "Témoignages" },
-  { href: "/admin/fil", libelle: "Le fil" },
-  { href: "/admin/calendrier", libelle: "Dates" },
-  { href: "/admin/bons", libelle: "Bons" },
-  { href: "/admin/projets", libelle: "Projets" },
-  { href: "/admin/rappels", libelle: "Rappels" },
-];
 
 export default async function LayoutAdmin({ children }: { children: React.ReactNode }) {
   const membre = await membreCourant();
@@ -33,28 +23,7 @@ export default async function LayoutAdmin({ children }: { children: React.ReactN
         </span>
       </header>
 
-      <nav className="-mx-4 mb-6 overflow-x-auto px-4">
-        <ul className="flex gap-2">
-          {LIENS.map((lien) => (
-            <li key={lien.href}>
-              <Link
-                href={lien.href}
-                className="border-bordure block whitespace-nowrap rounded-full border bg-white px-3 py-1.5 text-sm no-underline"
-              >
-                {lien.libelle}
-              </Link>
-            </li>
-          ))}
-          <li>
-            <Link
-              href="/"
-              className="border-bordure text-encre-douce block whitespace-nowrap rounded-full border border-dashed px-3 py-1.5 text-sm no-underline"
-            >
-              Voir comme maman
-            </Link>
-          </li>
-        </ul>
-      </nav>
+      <NavAdmin />
 
       {children}
     </div>

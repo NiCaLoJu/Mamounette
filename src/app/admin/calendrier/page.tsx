@@ -1,3 +1,4 @@
+import EnteteSection from "@/components/EnteteSection";
 import { creerRendezVous, supprimerRendezVous } from "@/lib/actions";
 import { frise, membres } from "@/lib/donnees";
 import { aujourdhui, ecartJours, enLettres } from "@/lib/dates";
@@ -11,13 +12,12 @@ export default async function Calendrier() {
 
   return (
     <main className="flex flex-col gap-6">
-      <div>
-        <h1 className="titre mb-1 text-2xl">Les dates</h1>
-        <p className="text-encre-douce text-sm">
-          Elles ne servent qu'ici : elles disent à l'app quel jour ouvrir une journée. Elle ne voit
-          jamais cette page.
-        </p>
-      </div>
+      <EnteteSection
+        emoji="📅"
+        titre="Les dates"
+        description="Elles ne servent qu'ici : elles disent à l'app quel jour ouvrir une journée. Elle ne voit jamais cette page."
+        teinte="sable"
+      />
 
       <form
         action={creerRendezVous}

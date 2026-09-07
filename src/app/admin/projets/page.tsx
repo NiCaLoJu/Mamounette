@@ -1,4 +1,5 @@
 import FormulaireProjet from "@/components/FormulaireProjet";
+import EnteteSection from "@/components/EnteteSection";
 import { projets } from "@/lib/donnees";
 
 export const dynamic = "force-dynamic";
@@ -8,13 +9,12 @@ export default async function ProjetsAdmin() {
 
   return (
     <main className="flex flex-col gap-6">
-      <div>
-        <h1 className="titre mb-1 text-2xl">La boîte à projets</h1>
-        <p className="text-encre-douce text-sm">
-          Ne déposez pas qu'une idée : une photo du gîte, la carte du resto. Le futur devient
-          concret.
-        </p>
-      </div>
+      <EnteteSection
+        emoji="🌍"
+        titre="La boîte à projets"
+        description="Ne déposez pas qu'une idée : une photo du gîte, la carte du resto. Le futur devient concret."
+        teinte="lagon"
+      />
 
       <FormulaireProjet />
 

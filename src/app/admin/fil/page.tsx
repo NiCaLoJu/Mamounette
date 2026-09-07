@@ -1,5 +1,6 @@
 import Composeur from "@/components/Composeur";
 import FilMessages from "@/components/FilMessages";
+import EnteteSection from "@/components/EnteteSection";
 import { exigerEnfant } from "@/lib/auth";
 import { fil, marquerFilLu } from "@/lib/donnees";
 
@@ -13,12 +14,12 @@ export default async function FilAdmin() {
 
   return (
     <main className="flex flex-col gap-5">
-      <div>
-        <h1 className="titre mb-1 text-2xl">Le fil</h1>
-        <p className="text-encre-douce text-sm">
-          Ce qu'elle écrit, et ce que vous lui répondez. Elle est prévenue à chaque message.
-        </p>
-      </div>
+      <EnteteSection
+        emoji="💬"
+        titre="Le fil"
+        description="Ce qu'elle écrit, et ce que vous lui répondez. Elle est prévenue à chaque message."
+        teinte="ciel"
+      />
 
       <FilMessages messages={messages} moi={moi.id} vide="Elle n'a encore rien écrit." />
 

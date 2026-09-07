@@ -1,3 +1,4 @@
+import EnteteSection from "@/components/EnteteSection";
 import { creerBon, honorerBon } from "@/lib/actions";
 import { bons } from "@/lib/donnees";
 
@@ -8,12 +9,12 @@ export default async function BonsAdmin() {
 
   return (
     <main className="flex flex-col gap-6">
-      <div>
-        <h1 className="titre mb-1 text-2xl">Les bons pour…</h1>
-        <p className="text-encre-douce text-sm">
-          Un vrai coupon : elle le réclame, vous êtes prévenus, vous le marquez fait.
-        </p>
-      </div>
+      <EnteteSection
+        emoji="🎟️"
+        titre="Les bons pour…"
+        description="Un vrai coupon : elle le réclame, vous êtes prévenus, vous le marquez fait."
+        teinte="corail"
+      />
 
       <form
         action={creerBon}

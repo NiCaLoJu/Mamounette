@@ -1,3 +1,4 @@
+import EnteteSection from "@/components/EnteteSection";
 import { membres } from "@/lib/donnees";
 
 export const dynamic = "force-dynamic";
@@ -12,13 +13,12 @@ export default async function Liens() {
 
   return (
     <main className="flex flex-col gap-6">
-      <div>
-        <h1 className="titre mb-1 text-2xl">Les liens d'accès</h1>
-        <p className="text-encre-douce text-sm">
-          Un lien par personne, à ouvrir une fois sur son téléphone. Ne les partagez nulle part
-          ailleurs : c'est la seule clé de l'application.
-        </p>
-      </div>
+      <EnteteSection
+        emoji="🔑"
+        titre="Les liens d'accès"
+        description="Un lien par personne, à ouvrir une fois sur son téléphone. Ne les partagez nulle part ailleurs : c'est la seule clé de l'application."
+        teinte="brume"
+      />
 
       <ul className="flex flex-col gap-3">
         {gens.map((g) => (

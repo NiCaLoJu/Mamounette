@@ -1,4 +1,6 @@
 import Link from "next/link";
+import EnteteSection from "@/components/EnteteSection";
+import { TEINTES } from "@/lib/sections";
 import { capsulesFiltrees, type FiltreCapsules } from "@/lib/donnees";
 import { enCourt } from "@/lib/dates";
 import { EMOJIS_TYPE, LIBELLES_TYPE } from "@/lib/types";
@@ -24,12 +26,12 @@ export default async function Capsules({
 
   return (
     <main className="flex flex-col gap-5">
-      <div>
-        <h1 className="titre mb-1 text-2xl">Toutes les capsules</h1>
-        <p className="text-encre-douce text-sm">
-          Rien n'est perdu : tout se relit, se corrige, se déplace ou se supprime.
-        </p>
-      </div>
+      <EnteteSection
+        emoji="🗂️"
+        titre="Toutes les capsules"
+        description="Rien n'est perdu : tout se relit, se corrige, se déplace ou se supprime."
+        teinte="lilas"
+      />
 
       <nav className="-mx-4 overflow-x-auto px-4">
         <ul className="flex gap-2">
@@ -37,8 +39,13 @@ export default async function Capsules({
             <li key={f.cle}>
               <Link
                 href={f.cle === "tout" ? "/admin/capsules" : `/admin/capsules?filtre=${f.cle}`}
-                className={`block whitespace-nowrap rounded-full border px-3 py-1.5 text-sm no-underline ${
-                  actif === f.cle ? "border-rose bg-rose text-white" : "border-bordure bg-white"
+                style={
+                  actif === f.cle
+                    ? { backgroundColor: TEINTES.lilas.encre, borderColor: TEINTES.lilas.encre }
+                    : { backgroundColor: TEINTES.lilas.fond, borderColor: TEINTES.lilas.bordure, color: TEINTES.lilas.encre }
+                }
+                className={`flex min-h-10 items-center whitespace-nowrap rounded-2xl border px-3 text-sm no-underline ${
+                  actif === f.cle ? "font-medium text-white" : ""
                 }`}
               >
                 {f.libelle}
@@ -71,13 +78,14 @@ export default async function Capsules({
                 </span>
 
                 <span
-                  className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] ${
+                  style={
                     capsule.etat === "publiee"
-                      ? "bg-rose-clair"
+                      ? { backgroundColor: TEINTES.menthe.fond, color: TEINTES.menthe.encre }
                       : capsule.destination === "reserve"
-                        ? "border-bordure border border-dashed"
-                        : "bg-or/20"
-                  }`}
+                        ? { backgroundColor: TEINTES.lilas.fond, color: TEINTES.lilas.encre }
+                        : { backgroundColor: TEINTES.sable.fond, color: TEINTES.sable.encre }
+                  }
+                  className="shrink-0 rounded-full px-2 py-1 text-[11px]"
                 >
                   {capsule.etat === "publiee"
                     ? "chez elle"
