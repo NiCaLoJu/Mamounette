@@ -9,7 +9,8 @@ Deux espaces, une seule application :
 - **Côté maman** — la journée du jour en cases à ouvrir, la pioche, le chemin
   parcouru, ses bons pour…, la boîte à projets.
 - **Côté admin** (Nicolas, Foufou, Loulou, et Namou s'il le souhaite) — déposer
-  des capsules, tenir le calendrier, garnir la réserve, programmer des rappels.
+  des capsules, les relire et les corriger, tenir le calendrier, garnir la
+  réserve, programmer des rappels.
 
 Il n'est question de rien d'autre que d'eux. Aucun suivi de symptômes, aucune
 mention du traitement : les dates ne servent qu'à savoir quel jour ouvrir une
@@ -106,6 +107,7 @@ src/
   app/
     (maman)/          son application : aujourd'hui, pioche, chemin, bons, projets
     admin/            le tableau de bord des garçons
+    admin/capsules/   la bibliothèque : relire, corriger, déplacer, supprimer
     api/taches/       la tâche planifiée (publication, filet, rappels)
     api/push/         l'enregistrement des appareils
     entree/[token]/   le lien secret

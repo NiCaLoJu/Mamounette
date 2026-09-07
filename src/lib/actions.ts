@@ -189,8 +189,98 @@ export async function creerCapsule(formulaire: FormData) {
 
 export async function supprimerCapsule(id: string) {
   await exigerEnfant();
+
+  const { data: capsule } = await db()
+    .from("capsules")
+    .select("media_chemin")
+    .eq("id", id)
+    .maybeSingle();
+
+  // Le fichier part avec la capsule, sans quoi le stockage se remplit de
+  // médias que plus rien ne référence.
+  if (capsule?.media_chemin) {
+    await db().storage.from("media").remove([capsule.media_chemin as string]);
+  }
+
   await db().from("capsules").delete().eq("id", id);
+
   revalidatePath("/admin");
+  revalidatePath("/admin/capsules");
+  revalidatePath("/");
+}
+
+/**
+ * Modifier une capsule déjà déposée : la renommer, la réécrire, la déplacer
+ * vers une autre date ou la remettre à la réserve.
+ */
+export async function modifierCapsule(formulaire: FormData) {
+  await exigerEnfant();
+
+  const id = formulaire.get("id") as string;
+  if (!id) throw new Error("Capsule introuvable.");
+
+  const { data: existante } = await db()
+    .from("capsules")
+    .select("etat, media_chemin")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (!existante) throw new Error("Capsule introuvable.");
+
+  const destination = formulaire.get("destination") as DestinationCapsule;
+  const rendezvousId = (formulaire.get("rendezvous_id") as string) || null;
+  const nouveauMedia = (formulaire.get("media_chemin") as string) || null;
+
+  const payloadBrut = formulaire.get("payload") as string | null;
+  let payload: Record<string, unknown> = {};
+  if (payloadBrut) {
+    try {
+      payload = JSON.parse(payloadBrut);
+    } catch {
+      payload = {};
+    }
+  }
+
+  // Une capsule déjà chez elle le reste : on ne la lui retire pas sous les yeux.
+  const dejaPubliee = existante.etat === "publiee";
+  const maintenant = new Date().toISOString();
+
+  if (nouveauMedia && existante.media_chemin) {
+    await db().storage.from("media").remove([existante.media_chemin as string]);
+  }
+
+  const { error } = await db()
+    .from("capsules")
+    .update({
+      titre: (formulaire.get("titre") as string) || null,
+      teaser: (formulaire.get("teaser") as string) || null,
+      corps: (formulaire.get("corps") as string) || null,
+      lien_url: (formulaire.get("lien_url") as string) || null,
+      ...(nouveauMedia ? { media_chemin: nouveauMedia } : {}),
+      payload,
+      destination,
+      rendezvous_id: destination === "rendezvous" ? rendezvousId : null,
+      etat: dejaPubliee ? "publiee" : destination === "direct" ? "publiee" : "programmee",
+      publiee_le: dejaPubliee
+        ? undefined
+        : destination === "direct"
+          ? maintenant
+          : null,
+    })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  if (!dejaPubliee && destination === "direct") {
+    await notifierMaman(
+      "Un mot pour toi 💌",
+      (formulaire.get("teaser") as string) || "Quelqu'un vient de déposer quelque chose.",
+    );
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/capsules");
+  revalidatePath("/");
 }
 
 export async function publierCapsules(rendezvousId: string) {

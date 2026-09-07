@@ -206,3 +206,26 @@ export async function rappelsAVenir() {
     destinataire: { prenom: string } | null;
   }[];
 }
+
+export type FiltreCapsules = "tout" | "reserve" | "programmees" | "publiees" | "feuilleton";
+
+/** La bibliothèque de l'admin : tout ce qui a été déposé, filtrable. */
+export async function capsulesFiltrees(
+  filtre: FiltreCapsules = "tout",
+  limite = 200,
+): Promise<CapsuleAffichee[]> {
+  let requete = db().from("capsules").select(CHAMPS);
+
+  if (filtre === "reserve") {
+    requete = requete.eq("destination", "reserve").is("piochee_le", null);
+  } else if (filtre === "programmees") {
+    requete = requete.eq("etat", "programmee");
+  } else if (filtre === "publiees") {
+    requete = requete.eq("etat", "publiee");
+  } else if (filtre === "feuilleton") {
+    requete = requete.eq("type", "episode");
+  }
+
+  const { data } = await requete.order("cree_le", { ascending: false }).limit(limite);
+  return avecMedias((data ?? []) as CapsuleAffichee[]);
+}

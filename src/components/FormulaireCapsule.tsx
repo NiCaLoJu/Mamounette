@@ -2,10 +2,11 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { creerCapsule } from "@/lib/actions";
+import { creerCapsule, modifierCapsule } from "@/lib/actions";
 import { compresser } from "@/lib/image";
 import { envoyerFichier } from "@/lib/envoi";
 import { LIBELLES_TYPE, EMOJIS_TYPE, type TypeCapsule } from "@/lib/types";
+import type { CapsuleAffichee } from "@/lib/donnees";
 import EnregistreurVocal from "./EnregistreurVocal";
 
 const TYPES: TypeCapsule[] = [
@@ -21,20 +22,40 @@ const TYPES: TypeCapsule[] = [
 
 type RendezVousOption = { id: string; date: string; libelle: string };
 
-export default function FormulaireCapsule({ rendezvous }: { rendezvous: RendezVousOption[] }) {
+/** Trois cases, pré-remplies quand on modifie une capsule existante. */
+function troisChamps(valeurs: unknown): string[] {
+  const liste = Array.isArray(valeurs) ? (valeurs as string[]) : [];
+  return [liste[0] ?? "", liste[1] ?? "", liste[2] ?? ""];
+}
+
+/**
+ * Le même formulaire sert au dépôt et à la modification : une capsule qu'on
+ * ne peut plus retrouver ni corriger après coup est une capsule perdue.
+ */
+export default function FormulaireCapsule({
+  rendezvous,
+  capsule,
+}: {
+  rendezvous: RendezVousOption[];
+  capsule?: CapsuleAffichee;
+}) {
   const router = useRouter();
-  const [type, setType] = useState<TypeCapsule>("anecdote");
-  const [destination, setDestination] = useState<"reserve" | "rendezvous" | "direct">("reserve");
+  const modification = Boolean(capsule);
+
+  const [type, setType] = useState<TypeCapsule>(capsule?.type ?? "anecdote");
+  const [destination, setDestination] = useState<"reserve" | "rendezvous" | "direct">(
+    capsule?.destination ?? "reserve",
+  );
   const [fichier, setFichier] = useState<File | null>(null);
-  const [duree, setDuree] = useState(0);
+  const [duree, setDuree] = useState(capsule?.media_duree ?? 0);
   const [erreur, setErreur] = useState<string | null>(null);
   const [etape, setEtape] = useState<string | null>(null);
   const [enCours, demarrer] = useTransition();
 
   // Quiz
-  const [choix, setChoix] = useState<string[]>(["", "", ""]);
+  const [choix, setChoix] = useState<string[]>(troisChamps(capsule?.payload?.choix));
   // Triple témoignage
-  const [reponses, setReponses] = useState<string[]>(["", "", ""]);
+  const [reponses, setReponses] = useState<string[]>(troisChamps(capsule?.payload?.reponses));
 
   function construirePayload(formulaire: FormData): string {
     if (type === "quiz") {
@@ -59,6 +80,7 @@ export default function FormulaireCapsule({ rendezvous }: { rendezvous: RendezVo
     setErreur(null);
 
     const formulaire = new FormData(evenement.currentTarget);
+    if (capsule) formulaire.set("id", capsule.id);
     formulaire.set("type", type);
     formulaire.set("destination", destination);
     formulaire.set("payload", construirePayload(formulaire));
@@ -84,8 +106,13 @@ export default function FormulaireCapsule({ rendezvous }: { rendezvous: RendezVo
 
     demarrer(async () => {
       try {
-        await creerCapsule(formulaire);
-        router.push("/admin");
+        if (modification) {
+          await modifierCapsule(formulaire);
+          router.push("/admin/capsules");
+        } else {
+          await creerCapsule(formulaire);
+          router.push("/admin");
+        }
       } catch (e) {
         setEtape(null);
         setErreur(e instanceof Error ? e.message : "Quelque chose a coincé.");
@@ -99,8 +126,10 @@ export default function FormulaireCapsule({ rendezvous }: { rendezvous: RendezVo
   return (
     <form onSubmit={envoyer} className="flex flex-col gap-5">
       {/* Le type */}
-      <fieldset>
-        <legend className="text-encre-douce mb-2 text-sm">Quel genre de capsule ?</legend>
+      <fieldset disabled={modification} className="disabled:opacity-60">
+        <legend className="text-encre-douce mb-2 text-sm">
+          {modification ? "Type (non modifiable)" : "Quel genre de capsule ?"}
+        </legend>
         <div className="flex flex-wrap gap-2">
           {TYPES.map((t) => (
             <button
@@ -121,21 +150,38 @@ export default function FormulaireCapsule({ rendezvous }: { rendezvous: RendezVo
 
       <label className="flex flex-col gap-1.5">
         <span className="text-encre-douce text-sm">Titre</span>
-        <input name="titre" className={champ} placeholder="Le jour où papa a repeint le chat" />
+        <input
+          name="titre"
+          defaultValue={capsule?.titre ?? ""}
+          className={champ}
+          placeholder="Le jour où papa a repeint le chat"
+        />
       </label>
 
       <label className="flex flex-col gap-1.5">
         <span className="text-encre-douce text-sm">
           L'étiquette sur la case fermée <em>— ce qu'elle lit avant d'ouvrir</em>
         </span>
-        <input name="teaser" className={champ} placeholder="Une bêtise de 2005" maxLength={60} />
+        <input
+          name="teaser"
+          defaultValue={capsule?.teaser ?? ""}
+          className={champ}
+          placeholder="Une bêtise de 2005"
+          maxLength={60}
+        />
       </label>
 
       {/* Selon le type */}
       {(type === "anecdote" || type === "photo" || type === "vocal" || type === "video" || type === "episode") && (
         <label className="flex flex-col gap-1.5">
           <span className="text-encre-douce text-sm">Le mot qui va avec</span>
-          <textarea name="corps" rows={5} className={champ} placeholder="Raconte…" />
+          <textarea
+            name="corps"
+            defaultValue={capsule?.corps ?? ""}
+            rows={5}
+            className={champ}
+            placeholder="Raconte…"
+          />
         </label>
       )}
 
@@ -145,10 +191,29 @@ export default function FormulaireCapsule({ rendezvous }: { rendezvous: RendezVo
           <input
             name="lien_url"
             type="url"
+            defaultValue={capsule?.lien_url ?? ""}
             className={champ}
             placeholder="https://www.youtube.com/watch?v=…"
           />
         </label>
+      )}
+
+      {/* Le média déjà en place : on le voit avant de décider de le remplacer. */}
+      {capsule?.media_url && (
+        <div className="border-bordure flex flex-col gap-2 rounded-2xl border bg-white p-4">
+          <p className="text-encre-douce text-sm">Fichier actuel</p>
+          {capsule.type === "photo" && (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src={capsule.media_url} alt="" className="w-full rounded-xl" />
+          )}
+          {capsule.type === "vocal" && <audio controls src={capsule.media_url} className="w-full" />}
+          {capsule.type === "video" && (
+            <video controls playsInline src={capsule.media_url} className="w-full rounded-xl" />
+          )}
+          <p className="text-encre-douce text-xs">
+            Choisis un nouveau fichier ci-dessous pour le remplacer, ou laisse vide pour le garder.
+          </p>
+        </div>
       )}
 
       {(type === "photo" || type === "video") && (
@@ -179,7 +244,12 @@ export default function FormulaireCapsule({ rendezvous }: { rendezvous: RendezVo
 
       {type === "quiz" && (
         <div className="flex flex-col gap-3">
-          <input name="question" className={champ} placeholder="Qui a fait la pire bêtise en 2005 ?" />
+          <input
+            name="question"
+            defaultValue={(capsule?.payload?.question as string) ?? ""}
+            className={champ}
+            placeholder="Qui a fait la pire bêtise en 2005 ?"
+          />
           {choix.map((valeur, i) => (
             <input
               key={i}
@@ -193,7 +263,12 @@ export default function FormulaireCapsule({ rendezvous }: { rendezvous: RendezVo
               placeholder={`Proposition ${i + 1}`}
             />
           ))}
-          <input name="reponse" className={champ} placeholder="La réponse (et le fin mot de l'histoire)" />
+          <input
+            name="reponse"
+            defaultValue={(capsule?.payload?.reponse as string) ?? ""}
+            className={champ}
+            placeholder="La réponse (et le fin mot de l'histoire)"
+          />
         </div>
       )}
 
@@ -201,6 +276,7 @@ export default function FormulaireCapsule({ rendezvous }: { rendezvous: RendezVo
         <div className="flex flex-col gap-3">
           <input
             name="question"
+            defaultValue={(capsule?.payload?.question as string) ?? ""}
             className={champ}
             placeholder="Le pire plat que maman nous ait fait avaler"
           />
@@ -218,7 +294,12 @@ export default function FormulaireCapsule({ rendezvous }: { rendezvous: RendezVo
               placeholder={`Réponse anonyme ${i + 1}`}
             />
           ))}
-          <input name="solution" className={champ} placeholder="Qui est qui (elle le découvre après)" />
+          <input
+            name="solution"
+            defaultValue={(capsule?.payload?.solution as string) ?? ""}
+            className={champ}
+            placeholder="Qui est qui (elle le découvre après)"
+          />
         </div>
       )}
 
@@ -250,7 +331,12 @@ export default function FormulaireCapsule({ rendezvous }: { rendezvous: RendezVo
         </div>
 
         {destination === "rendezvous" && (
-          <select name="rendezvous_id" className={`${champ} mt-3`} required>
+          <select
+            name="rendezvous_id"
+            defaultValue={capsule?.rendezvous_id ?? ""}
+            className={`${champ} mt-3`}
+            required
+          >
             {rendezvous.length === 0 && <option value="">Aucune date enregistrée</option>}
             {rendezvous.map((r) => (
               <option key={r.id} value={r.id}>
@@ -268,7 +354,7 @@ export default function FormulaireCapsule({ rendezvous }: { rendezvous: RendezVo
         disabled={enCours || etape !== null}
         className="bg-rose rounded-full py-3 text-white transition active:scale-[0.98] disabled:opacity-60"
       >
-        {etape ?? "Déposer"}
+        {etape ?? (modification ? "Enregistrer" : "Déposer")}
       </button>
     </form>
   );

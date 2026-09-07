@@ -73,7 +73,10 @@ export default async function TableauDeBord() {
       </section>
 
       {/* La réserve : le filet de sécurité du projet. */}
-      <section className="border-bordure rounded-3xl border bg-white p-5">
+      <Link
+        href="/admin/capsules?filtre=reserve"
+        className="border-bordure rounded-3xl border bg-white p-5 no-underline"
+      >
         <h2 className="titre mb-1 text-xl">La réserve</h2>
         <p className="text-encre-douce text-sm">
           {reserve === 0 ? (
@@ -88,7 +91,7 @@ export default async function TableauDeBord() {
             </>
           )}
         </p>
-      </section>
+      </Link>
 
       {/* Ses réactions : le seul retour qu'on ait, et le meilleur carburant. */}
       {reactions.length > 0 && (
@@ -119,10 +122,11 @@ export default async function TableauDeBord() {
         ) : (
           <ul className="flex flex-col gap-2">
             {capsules.map((capsule) => (
-              <li
-                key={capsule.id}
-                className="border-bordure flex items-center gap-3 rounded-2xl border bg-white px-3 py-2"
-              >
+              <li key={capsule.id}>
+                <Link
+                  href={`/admin/capsules/${capsule.id}`}
+                  className="border-bordure flex items-center gap-3 rounded-2xl border bg-white px-3 py-2 no-underline"
+                >
                 <span className="text-xl">{EMOJIS_TYPE[capsule.type]}</span>
                 <span className="flex min-w-0 flex-1 flex-col">
                   <span className="truncate text-sm font-medium">
@@ -138,6 +142,7 @@ export default async function TableauDeBord() {
                     {capsule.ouverte_le && " · ouverte ✓"}
                   </span>
                 </span>
+                </Link>
               </li>
             ))}
           </ul>
