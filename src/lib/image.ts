@@ -6,6 +6,16 @@
 export async function compresser(fichier: File, cote = 1600, qualite = 0.82): Promise<File> {
   if (!fichier.type.startsWith("image/")) return fichier;
 
+  try {
+    return await recompresser(fichier, cote, qualite);
+  } catch {
+    // Un format que ce navigateur ne sait pas décoder (HEIC ailleurs que sur
+    // iPhone, par exemple). On envoie l'original plutôt que de tout bloquer.
+    return fichier;
+  }
+}
+
+async function recompresser(fichier: File, cote: number, qualite: number): Promise<File> {
   const bitmap = await createImageBitmap(fichier);
   const echelle = Math.min(1, cote / Math.max(bitmap.width, bitmap.height));
   const largeur = Math.round(bitmap.width * echelle);

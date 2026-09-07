@@ -1,4 +1,4 @@
-import { creerProjet } from "@/lib/actions";
+import FormulaireProjet from "@/components/FormulaireProjet";
 import { projets } from "@/lib/donnees";
 
 export const dynamic = "force-dynamic";
@@ -16,32 +16,7 @@ export default async function ProjetsAdmin() {
         </p>
       </div>
 
-      <form
-        action={creerProjet}
-        className="border-bordure flex flex-col gap-3 rounded-3xl border bg-white p-4"
-      >
-        <input
-          name="titre"
-          required
-          placeholder="Un week-end tous ensemble en Bretagne"
-          className="border-bordure rounded-2xl border px-3 py-2.5 text-sm"
-        />
-        <textarea
-          name="description"
-          rows={3}
-          placeholder="Ce qu'on ferait…"
-          className="border-bordure rounded-2xl border px-3 py-2.5 text-sm"
-        />
-        <input
-          type="file"
-          name="media"
-          accept="image/*"
-          className="border-bordure rounded-2xl border px-3 py-2.5 text-sm"
-        />
-        <button type="submit" className="bg-rose rounded-full py-2.5 text-sm text-white">
-          Ajouter le projet
-        </button>
-      </form>
+      <FormulaireProjet />
 
       <ul className="flex flex-col gap-2">
         {liste.map((projet) => (

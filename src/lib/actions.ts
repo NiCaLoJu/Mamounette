@@ -115,18 +115,25 @@ export async function marquerEnvie(projetId: string, envie: boolean) {
 // Côté administration
 // ---------------------------------------------------------------------------
 
-async function televerser(fichier: File | null, prefixe: string): Promise<string | null> {
-  if (!fichier || fichier.size === 0) return null;
+/**
+ * Prépare un envoi direct du navigateur vers Supabase.
+ *
+ * Le fichier ne transite pas par ici : une fonction serverless Vercel refuse
+ * les corps de requête au-delà de 4,5 Mo, ce qu'une simple vidéo dépasse.
+ * On signe donc une autorisation d'écriture à usage unique, et le téléphone
+ * parle directement au stockage.
+ */
+export async function preparerEnvoi(prefixe: string, extension: string) {
+  await exigerEnfant();
 
-  const extension = fichier.name.split(".").pop()?.toLowerCase() ?? "bin";
   const chemin = `${prefixe}/${crypto.randomUUID()}.${extension}`;
+  const { data, error } = await db().storage.from("media").createSignedUploadUrl(chemin);
 
-  const { error } = await db()
-    .storage.from("media")
-    .upload(chemin, fichier, { contentType: fichier.type, upsert: false });
+  if (error || !data) {
+    throw new Error(`Envoi impossible : ${error?.message ?? "autorisation refusée"}`);
+  }
 
-  if (error) throw new Error(`Envoi du fichier impossible : ${error.message}`);
-  return chemin;
+  return { chemin, token: data.token };
 }
 
 export async function creerCapsule(formulaire: FormData) {
@@ -135,7 +142,6 @@ export async function creerCapsule(formulaire: FormData) {
   const type = formulaire.get("type") as TypeCapsule;
   const destination = formulaire.get("destination") as DestinationCapsule;
   const rendezvousId = (formulaire.get("rendezvous_id") as string) || null;
-  const fichier = formulaire.get("media") as File | null;
 
   const payloadBrut = formulaire.get("payload") as string | null;
   let payload: Record<string, unknown> = {};
@@ -159,7 +165,7 @@ export async function creerCapsule(formulaire: FormData) {
       teaser: (formulaire.get("teaser") as string) || null,
       corps: (formulaire.get("corps") as string) || null,
       lien_url: (formulaire.get("lien_url") as string) || null,
-      media_chemin: await televerser(fichier, type),
+      media_chemin: (formulaire.get("media_chemin") as string) || null,
       media_duree: Number(formulaire.get("media_duree")) || null,
       payload,
       destination,
@@ -242,13 +248,12 @@ export async function honorerBon(id: string) {
 
 export async function creerProjet(formulaire: FormData) {
   const auteur = await exigerEnfant();
-  const fichier = formulaire.get("media") as File | null;
 
   await db().from("projets").insert({
     auteur_id: auteur.id,
     titre: formulaire.get("titre") as string,
     description: (formulaire.get("description") as string) || null,
-    media_chemin: await televerser(fichier, "projets"),
+    media_chemin: (formulaire.get("media_chemin") as string) || null,
   });
 
   revalidatePath("/admin/projets");

@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { creerCapsule } from "@/lib/actions";
 import { compresser } from "@/lib/image";
+import { envoyerFichier } from "@/lib/envoi";
 import { LIBELLES_TYPE, EMOJIS_TYPE, type TypeCapsule } from "@/lib/types";
 import EnregistreurVocal from "./EnregistreurVocal";
 
@@ -27,6 +28,7 @@ export default function FormulaireCapsule({ rendezvous }: { rendezvous: RendezVo
   const [fichier, setFichier] = useState<File | null>(null);
   const [duree, setDuree] = useState(0);
   const [erreur, setErreur] = useState<string | null>(null);
+  const [etape, setEtape] = useState<string | null>(null);
   const [enCours, demarrer] = useTransition();
 
   // Quiz
@@ -61,19 +63,31 @@ export default function FormulaireCapsule({ rendezvous }: { rendezvous: RendezVo
     formulaire.set("destination", destination);
     formulaire.set("payload", construirePayload(formulaire));
 
+    // Le fichier part directement vers le stockage : il ne passe pas par
+    // le serveur, qui refuserait tout ce qui dépasse quelques mégaoctets.
     if (fichier) {
-      const pret = fichier.type.startsWith("image/") ? await compresser(fichier) : fichier;
-      formulaire.set("media", pret);
-      formulaire.set("media_duree", String(duree));
-    } else {
-      formulaire.delete("media");
+      try {
+        setEtape("Préparation…");
+        const pret = fichier.type.startsWith("image/") ? await compresser(fichier) : fichier;
+
+        setEtape(pret.size > 2_000_000 ? "Envoi du fichier… (ça peut prendre un moment)" : "Envoi…");
+        formulaire.set("media_chemin", await envoyerFichier(pret, type));
+        formulaire.set("media_duree", String(duree));
+      } catch (e) {
+        setEtape(null);
+        setErreur(e instanceof Error ? e.message : "L'envoi du fichier a échoué.");
+        return;
+      }
     }
+
+    setEtape("On dépose…");
 
     demarrer(async () => {
       try {
         await creerCapsule(formulaire);
         router.push("/admin");
       } catch (e) {
+        setEtape(null);
         setErreur(e instanceof Error ? e.message : "Quelque chose a coincé.");
       }
     });
@@ -144,8 +158,11 @@ export default function FormulaireCapsule({ rendezvous }: { rendezvous: RendezVo
           </span>
           <input
             type="file"
-            accept={type === "photo" ? "image/*" : "video/*"}
-            onChange={(e) => setFichier(e.target.files?.[0] ?? null)}
+            accept={type === "photo" ? "image/*,.heic,.heif" : "video/*,.mov"}
+            onChange={(e) => {
+              setErreur(null);
+              setFichier(e.target.files?.[0] ?? null);
+            }}
             className={champ}
           />
         </label>
@@ -248,10 +265,10 @@ export default function FormulaireCapsule({ rendezvous }: { rendezvous: RendezVo
 
       <button
         type="submit"
-        disabled={enCours}
+        disabled={enCours || etape !== null}
         className="bg-rose rounded-full py-3 text-white transition active:scale-[0.98] disabled:opacity-60"
       >
-        {enCours ? "On dépose…" : "Déposer"}
+        {etape ?? "Déposer"}
       </button>
     </form>
   );

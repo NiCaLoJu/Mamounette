@@ -39,6 +39,7 @@ Créer un projet (région Europe), puis exécuter dans l'éditeur SQL, dans l'or
 | `supabase/migrations/0002_storage.sql` | le bucket privé des médias |
 | `supabase/migrations/0003_seed.sql` | les cinq personnes et leurs liens secrets |
 | `supabase/migrations/0004_cron.sql` | la tâche planifiée (après le déploiement) |
+| `supabase/migrations/0005_media.sql` | les formats de fichiers que produisent les téléphones |
 
 Récupérer ensuite les liens d'accès :
 
@@ -79,6 +80,16 @@ d'environnement, puis exécuter `0004_cron.sql` avec le domaine réel.
 **L'iPhone.** Les notifications web n'existent sur iOS que si l'application est
 installée sur l'écran d'accueil, depuis Safari, et à partir d'iOS 16.4. Le bloc
 d'installation guide le geste ; le reste de l'application fonctionne sans.
+
+**Les fichiers ne passent pas par Vercel.** Une fonction serverless refuse les
+corps de requête au-delà de 4,5 Mo — soit à peu près n'importe quelle vidéo. Le
+navigateur reçoit donc une autorisation d'écriture signée et parle directement
+au stockage Supabase. Plafond : 45 Mo par fichier, et les photos sont
+recompressées avant l'envoi.
+
+**Les formats d'Apple.** Safari n'enregistre les vocaux qu'en `audio/mp4`, les
+photos peuvent arriver en HEIC et les vidéos en QuickTime. Le type réel du
+fichier est lu à la source, jamais deviné à partir de son nom.
 
 **La mise en veille de Supabase.** L'offre gratuite met un projet en pause après
 sept jours sans activité. La tâche planifiée toutes les quinze minutes suffit à
