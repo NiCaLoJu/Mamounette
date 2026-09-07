@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@theme {
+  --color-fond: #fdf8f4;
+  --color-fond-carte: #ffffff;
+  --color-encre: #3b3239;
+  --color-encre-douce: #7a6b74;
+  --color-rose: #c96f8b;
+  --color-rose-clair: #f7e4ea;
+  --color-or: #d9a441;
+  --color-bordure: #ece0e5;
+
+  --font-titre: "Georgia", "Times New Roman", serif;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--color-fond);
+  color: var(--color-encre);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Confortable sur iPhone, encoche comprise. */
+  padding-bottom: env(safe-area-inset-bottom);
+  overscroll-behavior-y: contain;
+}
+
+.titre {
+  font-family: var(--font-titre);
+  letter-spacing: -0.01em;
+}
+
+/* La case d'avent qui s'ouvre. */
+@keyframes eclosion {
+  0% { transform: scale(0.94); opacity: 0; }
+  60% { transform: scale(1.02); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.eclot {
+  animation: eclosion 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eclot { animation: none; }
+}
