@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { membreCourant } from "@/lib/auth";
+import { ongletsGarnis } from "@/lib/donnees";
 import BarreOnglets from "@/components/BarreOnglets";
 
 export default async function LayoutMaman({ children }: { children: React.ReactNode }) {
@@ -7,6 +8,7 @@ export default async function LayoutMaman({ children }: { children: React.ReactN
   if (!membre) redirect("/bienvenue");
 
   const apercu = membre.role === "enfant";
+  const garnis = await ongletsGarnis();
 
   return (
     <div className="mx-auto min-h-dvh max-w-md pb-24">
@@ -19,7 +21,7 @@ export default async function LayoutMaman({ children }: { children: React.ReactN
         </p>
       )}
       {children}
-      <BarreOnglets />
+      <BarreOnglets garnis={garnis} />
     </div>
   );
 }

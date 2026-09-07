@@ -388,3 +388,32 @@ export async function marquerFilLu(): Promise<void> {
     .eq("auteur_id", maman.id)
     .is("lu_le", null);
 }
+
+/**
+ * Quels onglets méritent d'exister chez elle. Une icône qui n'ouvre sur rien
+ * est une petite déception : tant qu'une rubrique est vide, elle n'apparaît pas.
+ */
+export async function ongletsGarnis(): Promise<Record<string, boolean>> {
+  const compter = async (table: string) => {
+    const { count } = await db().from(table).select("id", { count: "exact", head: true });
+    return (count ?? 0) > 0;
+  };
+
+  const [reserve, dates, ouvertes, lesBons, lesProjets] = await Promise.all([
+    tailleReserve(),
+    compter("rendezvous"),
+    db()
+      .from("capsules")
+      .select("id", { count: "exact", head: true })
+      .not("ouverte_le", "is", null),
+    compter("bons"),
+    compter("projets"),
+  ]);
+
+  return {
+    "/pioche": reserve > 0,
+    "/chemin": dates || (ouvertes.count ?? 0) > 0,
+    "/bons": lesBons,
+    "/projets": lesProjets,
+  };
+}

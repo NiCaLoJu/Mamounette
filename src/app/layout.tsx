@@ -16,7 +16,8 @@ export const viewport: Viewport = {
   themeColor: "#fdf8f4",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  // Pas de maximumScale : elle doit pouvoir agrandir une photo ou un texte
+  // avec deux doigts, comme dans n'importe quelle application.
   viewportFit: "cover",
 };
 

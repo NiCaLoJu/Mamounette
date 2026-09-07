@@ -15,12 +15,37 @@
 
 html {
   -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+/*
+ * Safari zoome dès qu'un champ fait moins de 16 px, et ne dézoome jamais
+ * ensuite : la page reste de travers pour le reste de la visite.
+ * Les champs gardent donc 16 px, quelle que soit leur classe.
+ */
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
+/* Rien de tapable en dessous de 44 px : la recommandation d'Apple, et le
+   confort minimum pour des doigts fatigués. */
+button,
+a[role="button"],
+input[type="file"],
+select {
+  min-height: 44px;
 }
 
 body {
   background: var(--color-fond);
   color: var(--color-encre);
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Le socle du harnais descend à 14 px ; c'est petit pour lire un souvenir
+     sur un téléphone, à bout de bras. */
+  font-size: 16px;
+  line-height: 1.55;
   /* Confortable sur iPhone, encoche comprise. */
   padding-bottom: env(safe-area-inset-bottom);
   overscroll-behavior-y: contain;

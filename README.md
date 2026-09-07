@@ -31,6 +31,9 @@ journée, et elles n'apparaissent jamais de son côté.
   pioche et **complètent automatiquement une journée trop maigre** — c'est le
   filet du projet : le vrai risque n'est pas technique, c'est qu'un jour arrive
   sans que personne n'ait rien déposé.
+- **Les rubriques vides n'existent pas.** Chez elle, un onglet n'apparaît que
+  lorsqu'il a quelque chose à montrer. Une icône qui n'ouvre sur rien est une
+  petite déception, et elles seront nombreuses au démarrage.
 - **Le plafond de notifications.** Une par jour pour elle, au maximum. Une
   application qui devient bruyante est une application qu'on désinstalle. Seule
   exception : la réponse d'un de ses fils à un message qu'elle vient d'écrire
@@ -85,6 +88,19 @@ que maman la voit via « Voir comme maman ».
 
 Déployer sur Vercel (offre Hobby), reporter les mêmes variables
 d'environnement, puis exécuter `0004_cron.sql` avec le domaine réel.
+
+## L'iPhone comme terrain principal
+
+Tout est pensé pour un pouce, sur un écran de téléphone.
+
+- Les champs de saisie font 16 px : en dessous, Safari zoome au premier clic et
+  ne redescend jamais. Le zoom à deux doigts, lui, reste possible — elle doit
+  pouvoir agrandir une photo.
+- Rien de tapable en dessous de 44 px, et le texte courant est à 16 px.
+- Côté admin, trois raccourcis sur le tableau de bord ouvrent le formulaire
+  déjà réglé sur le bon type — déposer une photo tient en deux gestes. Le
+  bouton d'envoi reste collé sous le pouce plutôt qu'en bas d'un long
+  formulaire.
 
 ## Points de vigilance
 

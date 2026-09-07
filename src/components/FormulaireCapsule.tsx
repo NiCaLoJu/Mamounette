@@ -35,16 +35,20 @@ function troisChamps(valeurs: unknown): string[] {
 export default function FormulaireCapsule({
   rendezvous,
   capsule,
+  typeInitial,
+  rdvInitial,
 }: {
   rendezvous: RendezVousOption[];
   capsule?: CapsuleAffichee;
+  typeInitial?: TypeCapsule;
+  rdvInitial?: string;
 }) {
   const router = useRouter();
   const modification = Boolean(capsule);
 
-  const [type, setType] = useState<TypeCapsule>(capsule?.type ?? "anecdote");
+  const [type, setType] = useState<TypeCapsule>(capsule?.type ?? typeInitial ?? "anecdote");
   const [destination, setDestination] = useState<"reserve" | "rendezvous" | "direct">(
-    capsule?.destination ?? "reserve",
+    capsule?.destination ?? (rdvInitial ? "rendezvous" : "reserve"),
   );
   const [fichier, setFichier] = useState<File | null>(null);
   const [duree, setDuree] = useState(capsule?.media_duree ?? 0);
@@ -124,19 +128,18 @@ export default function FormulaireCapsule({
         <legend className="text-encre-douce mb-2 text-sm">
           {modification ? "Type (non modifiable)" : "Quel genre de capsule ?"}
         </legend>
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {TYPES.map((t) => (
             <button
               key={t}
               type="button"
               onClick={() => setType(t)}
-              className={`rounded-full border px-3 py-1.5 text-sm transition ${
-                type === t
-                  ? "border-rose bg-rose text-white"
-                  : "border-bordure bg-white"
+              className={`flex min-h-12 items-center gap-2 rounded-2xl border px-3 text-sm transition ${
+                type === t ? "border-rose bg-rose text-white" : "border-bordure bg-white"
               }`}
             >
-              {EMOJIS_TYPE[t]} {LIBELLES_TYPE[t]}
+              <span className="text-lg">{EMOJIS_TYPE[t]}</span>
+              {LIBELLES_TYPE[t]}
             </button>
           ))}
         </div>
@@ -336,7 +339,7 @@ export default function FormulaireCapsule({
         {destination === "rendezvous" && (
           <select
             name="rendezvous_id"
-            defaultValue={capsule?.rendezvous_id ?? ""}
+            defaultValue={capsule?.rendezvous_id ?? rdvInitial ?? ""}
             className={`${champ} mt-3`}
             required
           >
@@ -352,13 +355,15 @@ export default function FormulaireCapsule({
 
       {erreur && <p className="text-rose text-sm">{erreur}</p>}
 
-      <button
-        type="submit"
-        disabled={enCours || etape !== null}
-        className="bg-rose rounded-full py-3 text-white transition active:scale-[0.98] disabled:opacity-60"
-      >
-        {etape ?? (modification ? "Enregistrer" : "Déposer")}
-      </button>
+      <div className="bg-fond sticky bottom-0 -mx-4 px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3">
+        <button
+          type="submit"
+          disabled={enCours || etape !== null}
+          className="bg-rose w-full rounded-full py-3.5 text-white shadow-sm transition active:scale-[0.98] disabled:opacity-60"
+        >
+          {etape ?? (modification ? "Enregistrer" : "Déposer")}
+        </button>
+      </div>
     </form>
   );
 }

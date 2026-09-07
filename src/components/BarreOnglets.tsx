@@ -12,23 +12,29 @@ const ONGLETS = [
   { href: "/projets", libelle: "Projets", emoji: "🌍" },
 ];
 
-export default function BarreOnglets() {
+/**
+ * Les rubriques vides n'apparaissent pas : elles s'ajoutent au fur et à mesure
+ * que les garçons les remplissent. « Aujourd'hui » et « Le fil » restent
+ * toujours là — l'un est l'accueil, l'autre son seul moyen de nous parler.
+ */
+export default function BarreOnglets({ garnis }: { garnis: Record<string, boolean> }) {
   const chemin = usePathname();
+  const visibles = ONGLETS.filter((o) => garnis[o.href] !== false);
 
   return (
     <nav className="border-bordure fixed inset-x-0 bottom-0 z-20 border-t bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
       <ul className="mx-auto flex max-w-md">
-        {ONGLETS.map((onglet) => {
+        {visibles.map((onglet) => {
           const actif = chemin === onglet.href;
           return (
             <li key={onglet.href} className="flex-1">
               <Link
                 href={onglet.href}
-                className={`flex flex-col items-center gap-0.5 py-2 text-[10px] no-underline transition ${
+                className={`flex min-h-14 flex-col items-center justify-center gap-0.5 text-[11px] no-underline transition ${
                   actif ? "text-rose" : "text-encre-douce"
                 }`}
               >
-                <span className="text-lg">{onglet.emoji}</span>
+                <span className="text-xl">{onglet.emoji}</span>
                 {onglet.libelle}
               </Link>
             </li>

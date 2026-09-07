@@ -69,7 +69,7 @@ export default function CaseAvent({
         </div>
       )}
 
-      <div className="border-bordure mt-1 flex items-center gap-1 border-t pt-3">
+      <div className="border-bordure mt-1 flex items-center justify-between border-t pt-3">
         {EMOJIS.map((emoji) => (
           <button
             key={emoji}
@@ -79,7 +79,7 @@ export default function CaseAvent({
                 void reagir(capsule.id, emoji);
               });
             }}
-            className={`rounded-full px-2 py-1 text-xl transition active:scale-90 ${
+            className={`min-h-11 min-w-11 rounded-full text-2xl transition active:scale-90 ${
               reaction === emoji ? "bg-rose-clair" : "opacity-50"
             }`}
             aria-label={`Réagir avec ${emoji}`}
@@ -87,11 +87,9 @@ export default function CaseAvent({
             {emoji}
           </button>
         ))}
-
-        <span className="ml-auto">
-          <Composeur capsuleId={capsule.id} placeholder="Un mot en retour…" compact />
-        </span>
       </div>
+
+      <Composeur capsuleId={capsule.id} placeholder="Un mot en retour…" compact />
     </article>
   );
 }

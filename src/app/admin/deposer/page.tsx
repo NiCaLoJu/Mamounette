@@ -1,11 +1,16 @@
 import FormulaireCapsule from "@/components/FormulaireCapsule";
 import { prochainsRendezVous } from "@/lib/donnees";
 import { enLettres } from "@/lib/dates";
+import type { TypeCapsule } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
-export default async function Deposer() {
-  const rdvs = await prochainsRendezVous(12);
+export default async function Deposer({
+  searchParams,
+}: {
+  searchParams: Promise<{ type?: string; rdv?: string }>;
+}) {
+  const [{ type, rdv }, rdvs] = await Promise.all([searchParams, prochainsRendezVous(12)]);
 
   return (
     <main>
@@ -15,6 +20,8 @@ export default async function Deposer() {
       </p>
 
       <FormulaireCapsule
+        typeInitial={type as TypeCapsule | undefined}
+        rdvInitial={rdv}
         rendezvous={rdvs.map((r) => ({
           id: r.id,
           date: r.date,

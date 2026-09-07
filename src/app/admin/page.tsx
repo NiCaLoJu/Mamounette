@@ -35,6 +35,24 @@ export default async function TableauDeBord() {
     <main className="flex flex-col gap-6">
       <Notifications />
 
+      {/* Déposer doit tenir en deux gestes, debout dans le métro. */}
+      <nav className="grid grid-cols-3 gap-2">
+        {[
+          { type: "photo", emoji: "📷", libelle: "Photo" },
+          { type: "vocal", emoji: "🎙️", libelle: "Vocal" },
+          { type: "anecdote", emoji: "✏️", libelle: "Un mot" },
+        ].map((raccourci) => (
+          <Link
+            key={raccourci.type}
+            href={`/admin/deposer?type=${raccourci.type}`}
+            className="border-bordure flex min-h-20 flex-col items-center justify-center gap-1 rounded-2xl border bg-white text-sm no-underline transition active:scale-[0.97]"
+          >
+            <span className="text-2xl">{raccourci.emoji}</span>
+            {raccourci.libelle}
+          </Link>
+        ))}
+      </nav>
+
       {nonLus > 0 && (
         <Link
           href="/admin/fil"
@@ -84,10 +102,10 @@ export default async function TableauDeBord() {
               </p>
             )}
             <Link
-              href="/admin/deposer"
-              className="bg-rose mt-4 inline-block rounded-full px-4 py-2 text-sm text-white no-underline"
+              href={`/admin/deposer?rdv=${prochain.id}`}
+              className="bg-rose mt-4 inline-flex min-h-11 items-center rounded-full px-5 text-sm text-white no-underline"
             >
-              Déposer une capsule
+              Préparer cette journée
             </Link>
           </>
         ) : (
@@ -98,7 +116,7 @@ export default async function TableauDeBord() {
             </p>
             <Link
               href="/admin/calendrier"
-              className="bg-rose mt-4 inline-block rounded-full px-4 py-2 text-sm text-white no-underline"
+              className="bg-rose mt-4 inline-flex min-h-11 items-center rounded-full px-5 text-sm text-white no-underline"
             >
               Ajouter les dates
             </Link>
