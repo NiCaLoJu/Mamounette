@@ -2,10 +2,12 @@ import CaseAvent from "@/components/CaseAvent";
 import Notifications from "@/components/Notifications";
 import { capsulesDuJour, rendezVousDuJour, tailleReserve } from "@/lib/donnees";
 import { enLettres, aujourdhui } from "@/lib/dates";
+import { exigerMembre } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function Aujourdhui() {
+  const moi = await exigerMembre();
   const [capsules, rdv, reserve] = await Promise.all([
     capsulesDuJour(),
     rendezVousDuJour(),
@@ -51,7 +53,7 @@ export default async function Aujourdhui() {
       ) : (
         <div className="grid grid-cols-2 gap-3">
           {capsules.map((capsule) => (
-            <CaseAvent key={capsule.id} capsule={capsule} />
+            <CaseAvent key={capsule.id} capsule={capsule} moi={moi.id} />
           ))}
         </div>
       )}

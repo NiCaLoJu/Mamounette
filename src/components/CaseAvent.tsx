@@ -5,13 +5,21 @@ import { ouvrirCapsule, reagir } from "@/lib/actions";
 import type { CapsuleAffichee } from "@/lib/donnees";
 import { EMOJIS_TYPE } from "@/lib/types";
 import ContenuCapsule from "./ContenuCapsule";
+import Composeur from "./Composeur";
+import FilMessages from "./FilMessages";
 
 const EMOJIS = ["❤️", "😂", "🥹", "😍", "🤩"];
 
 /**
  * Une case fermée avec son étiquette de teasing. Elle ouvre à son rythme.
  */
-export default function CaseAvent({ capsule }: { capsule: CapsuleAffichee }) {
+export default function CaseAvent({
+  capsule,
+  moi,
+}: {
+  capsule: CapsuleAffichee;
+  moi: string;
+}) {
   const [ouverte, setOuverte] = useState(Boolean(capsule.ouverte_le));
   const [reaction, setReaction] = useState<string | null>(
     capsule.reactions?.[0]?.emoji ?? null,
@@ -55,6 +63,12 @@ export default function CaseAvent({ capsule }: { capsule: CapsuleAffichee }) {
 
       <ContenuCapsule capsule={capsule} />
 
+      {capsule.messages?.length > 0 && (
+        <div className="border-bordure border-t pt-3">
+          <FilMessages messages={capsule.messages} moi={moi} />
+        </div>
+      )}
+
       <div className="border-bordure mt-1 flex items-center gap-1 border-t pt-3">
         {EMOJIS.map((emoji) => (
           <button
@@ -73,6 +87,10 @@ export default function CaseAvent({ capsule }: { capsule: CapsuleAffichee }) {
             {emoji}
           </button>
         ))}
+
+        <span className="ml-auto">
+          <Composeur capsuleId={capsule.id} placeholder="Un mot en retour…" compact />
+        </span>
       </div>
     </article>
   );

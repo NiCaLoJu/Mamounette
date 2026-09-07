@@ -124,7 +124,7 @@ export async function marquerEnvie(projetId: string, envie: boolean) {
  * parle directement au stockage.
  */
 export async function preparerEnvoi(prefixe: string, extension: string) {
-  await exigerEnfant();
+  await exigerMembre();
 
   const chemin = `${prefixe}/${crypto.randomUUID()}.${extension}`;
   const { data, error } = await db().storage.from("media").createSignedUploadUrl(chemin);
@@ -468,3 +468,47 @@ export async function repondreTemoignage(capsuleId: string, texte: string) {
   revalidatePath("/admin/temoignages");
   revalidatePath("/admin");
 }
+
+// ---------------------------------------------------------------------------
+// La conversation — elle écrit, ils répondent
+// ---------------------------------------------------------------------------
+
+/**
+ * Un mot sous une capsule, ou un message envoyé sans raison. La même action
+ * sert aux deux sens : ce qui change, c'est qui est prévenu.
+ */
+export async function ecrire(formulaire: FormData) {
+  const auteur = await exigerMembre();
+
+  const texte = ((formulaire.get("texte") as string) ?? "").trim();
+  const media = (formulaire.get("media_chemin") as string) || null;
+  if (!texte && !media) return;
+
+  const capsuleId = (formulaire.get("capsule_id") as string) || null;
+
+  const { error } = await db().from("messages").insert({
+    capsule_id: capsuleId,
+    auteur_id: auteur.id,
+    texte: texte || null,
+    media_chemin: media,
+    media_duree: Number(formulaire.get("media_duree")) || null,
+  });
+
+  if (error) throw new Error(error.message);
+
+  const apercu = texte || "Elle t'a laissé un vocal.";
+
+  if (auteur.role === "maman") {
+    await notifierEnfants(`💬 Maman a écrit`, apercu, { url: "/admin/fil" });
+  } else {
+    await notifierMaman(`💬 ${auteur.prenom} t'a répondu`, texte || "Un vocal t'attend.", "/fil", {
+      plafond: false,
+    });
+  }
+
+  revalidatePath("/fil");
+  revalidatePath("/");
+  revalidatePath("/admin/fil");
+  revalidatePath("/admin");
+}
+

@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { piocher, reagir } from "@/lib/actions";
 import type { CapsuleAffichee } from "@/lib/donnees";
 import ContenuCapsule from "./ContenuCapsule";
+import Composeur from "./Composeur";
 
 const EMOJIS = ["❤️", "😂", "🥹", "😍", "🤩"];
 
@@ -50,6 +51,8 @@ export default function Pioche({ restantes }: { restantes: number }) {
             </button>
           ))}
         </div>
+
+        <Composeur capsuleId={tiree.id} placeholder="Un mot en retour…" compact />
 
         <button
           onClick={() => {

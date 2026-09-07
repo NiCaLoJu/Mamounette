@@ -5,9 +5,10 @@ import { usePathname } from "next/navigation";
 
 const ONGLETS = [
   { href: "/", libelle: "Aujourd'hui", emoji: "💌" },
-  { href: "/pioche", libelle: "La pioche", emoji: "🎁" },
-  { href: "/chemin", libelle: "Le chemin", emoji: "✨" },
-  { href: "/bons", libelle: "Mes bons", emoji: "🎟️" },
+  { href: "/fil", libelle: "Le fil", emoji: "💬" },
+  { href: "/pioche", libelle: "Pioche", emoji: "🎁" },
+  { href: "/chemin", libelle: "Chemin", emoji: "✨" },
+  { href: "/bons", libelle: "Bons", emoji: "🎟️" },
   { href: "/projets", libelle: "Projets", emoji: "🌍" },
 ];
 
@@ -23,11 +24,11 @@ export default function BarreOnglets() {
             <li key={onglet.href} className="flex-1">
               <Link
                 href={onglet.href}
-                className={`flex flex-col items-center gap-0.5 py-2 text-[11px] no-underline transition ${
+                className={`flex flex-col items-center gap-0.5 py-2 text-[10px] no-underline transition ${
                   actif ? "text-rose" : "text-encre-douce"
                 }`}
               >
-                <span className="text-xl">{onglet.emoji}</span>
+                <span className="text-lg">{onglet.emoji}</span>
                 {onglet.libelle}
               </Link>
             </li>

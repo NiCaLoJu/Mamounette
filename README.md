@@ -6,8 +6,10 @@ rendez-vous, une case à la fois.
 
 Deux espaces, une seule application :
 
-- **Côté maman** — la journée du jour en cases à ouvrir, la pioche, le chemin
-  parcouru, ses bons pour…, la boîte à projets.
+- **Côté maman** — la journée du jour en cases à ouvrir, le fil de discussion,
+  la pioche, le chemin parcouru, ses bons pour…, la boîte à projets. Elle peut
+  répondre sous chaque capsule ou écrire quand elle veut, au clavier ou à la
+  voix.
 - **Côté admin** (Nicolas, Foufou, Loulou, et Namou s'il le souhaite) — déposer
   des capsules, les relire et les corriger, tenir le calendrier, garnir la
   réserve, programmer des rappels.
@@ -30,7 +32,9 @@ journée, et elles n'apparaissent jamais de son côté.
   filet du projet : le vrai risque n'est pas technique, c'est qu'un jour arrive
   sans que personne n'ait rien déposé.
 - **Le plafond de notifications.** Une par jour pour elle, au maximum. Une
-  application qui devient bruyante est une application qu'on désinstalle.
+  application qui devient bruyante est une application qu'on désinstalle. Seule
+  exception : la réponse d'un de ses fils à un message qu'elle vient d'écrire
+  passe toujours — le plafond bride l'automatique, pas la conversation.
 
 ## Installation
 
@@ -46,6 +50,7 @@ Créer un projet (région Europe), puis exécuter dans l'éditeur SQL, dans l'or
 | `supabase/migrations/0004_cron.sql` | la tâche planifiée (après le déploiement) |
 | `supabase/migrations/0005_media.sql` | les formats de fichiers que produisent les téléphones |
 | `supabase/migrations/0006_temoignages.sql` | le triple témoignage collaboratif |
+| `supabase/migrations/0007_messages.sql` | la conversation dans les deux sens |
 
 Récupérer ensuite les liens d'accès :
 
@@ -114,6 +119,7 @@ src/
     admin/            le tableau de bord des garçons
     admin/capsules/   la bibliothèque : relire, corriger, déplacer, supprimer
     admin/temoignages/ les triples témoignages à compléter à trois
+    admin/fil/        la conversation avec elle
     api/taches/       la tâche planifiée (publication, filet, rappels)
     api/push/         l'enregistrement des appareils
     entree/[token]/   le lien secret

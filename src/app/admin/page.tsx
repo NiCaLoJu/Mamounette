@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   dernieresReactions,
   prochainsRendezVous,
+  motsNonLus,
   tailleReserve,
   temoignagesAttendus,
   toutesLesCapsules,
@@ -17,12 +18,13 @@ const CAPSULES_MINIMUM = 3;
 
 export default async function TableauDeBord() {
   const moi = await exigerEnfant();
-  const [rdvs, reserve, capsules, reactions, temoignages] = await Promise.all([
+  const [rdvs, reserve, capsules, reactions, temoignages, nonLus] = await Promise.all([
     prochainsRendezVous(4),
     tailleReserve(),
     toutesLesCapsules(12),
     dernieresReactions(6),
     temoignagesAttendus(moi.id),
+    motsNonLus(),
   ]);
 
   const prochain = rdvs[0];
@@ -32,6 +34,18 @@ export default async function TableauDeBord() {
   return (
     <main className="flex flex-col gap-6">
       <Notifications />
+
+      {nonLus > 0 && (
+        <Link
+          href="/admin/fil"
+          className="border-rose bg-rose-clair rounded-3xl border p-4 text-sm no-underline"
+        >
+          <strong>
+            💬 Maman a écrit {nonLus} message{nonLus > 1 ? "s" : ""}.
+          </strong>
+          <span className="text-encre-douce block">Va lui répondre.</span>
+        </Link>
+      )}
 
       {/* Ce que les autres attendent de toi passe avant tout le reste. */}
       {temoignages > 0 && (

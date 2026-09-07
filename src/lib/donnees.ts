@@ -10,20 +10,39 @@ export type Temoignage = {
   auteur: Auteur | null;
 };
 
+export type Message = {
+  id: string;
+  texte: string | null;
+  media_chemin: string | null;
+  media_url?: string | null;
+  cree_le: string;
+  auteur_id: string;
+  auteur: Auteur | null;
+};
+
 export type CapsuleAffichee = Capsule & {
   auteur: Auteur | null;
   media_url: string | null;
   reactions: { emoji: string | null }[];
   temoignages: Temoignage[];
+  messages: Message[];
 };
 
 const CHAMPS =
-  "*, auteur:membres(prenom, couleur), reactions(emoji), temoignages(id, texte, auteur_id, auteur:membres(prenom, couleur))";
+  "*, auteur:membres(prenom, couleur), reactions(emoji), temoignages(id, texte, auteur_id, auteur:membres(prenom, couleur)), messages(id, texte, media_chemin, cree_le, auteur_id, auteur:membres(prenom, couleur))";
 
 /** Ajoute les URLs signées des médias à un lot de capsules. */
 async function avecMedias(lignes: CapsuleAffichee[]): Promise<CapsuleAffichee[]> {
   return Promise.all(
-    lignes.map(async (c) => ({ ...c, media_url: await urlSignee(c.media_chemin) })),
+    lignes.map(async (c) => ({
+      ...c,
+      media_url: await urlSignee(c.media_chemin),
+      messages: await Promise.all(
+        (c.messages ?? [])
+          .sort((a, b) => a.cree_le.localeCompare(b.cree_le))
+          .map(async (m) => ({ ...m, media_url: await urlSignee(m.media_chemin) })),
+      ),
+    })),
   );
 }
 
@@ -306,4 +325,66 @@ export async function temoignagesEnCours(membreId: string): Promise<TemoignageEn
 export async function temoignagesAttendus(membreId: string): Promise<number> {
   const enCours = await temoignagesEnCours(membreId);
   return enCours.filter((t) => !t.aRepondu).length;
+}
+
+// ---------------------------------------------------------------------------
+// La conversation
+// ---------------------------------------------------------------------------
+
+export type MessageDuFil = Message & {
+  capsule: { titre: string | null; teaser: string | null } | null;
+};
+
+/** Toute la conversation, du plus ancien au plus récent. */
+export async function fil(limite = 150): Promise<MessageDuFil[]> {
+  const { data } = await db()
+    .from("messages")
+    .select("*, auteur:membres(prenom, couleur), capsule:capsules(titre, teaser)")
+    .order("cree_le", { ascending: false })
+    .limit(limite);
+
+  const messages = ((data ?? []) as unknown as MessageDuFil[]).reverse();
+
+  return Promise.all(
+    messages.map(async (m) => ({ ...m, media_url: await urlSignee(m.media_chemin) })),
+  );
+}
+
+/** Ce qu'elle a écrit et que personne n'a encore lu. */
+export async function motsNonLus(): Promise<number> {
+  const { data: maman } = await db()
+    .from("membres")
+    .select("id")
+    .eq("role", "maman")
+    .maybeSingle();
+
+  if (!maman) return 0;
+
+  const { count } = await db()
+    .from("messages")
+    .select("id", { count: "exact", head: true })
+    .eq("auteur_id", maman.id)
+    .is("lu_le", null);
+
+  return count ?? 0;
+}
+
+/**
+ * Ouvrir le fil vaut lecture. C'est une simple écriture, pas une action
+ * serveur : on l'appelle pendant le rendu de la page.
+ */
+export async function marquerFilLu(): Promise<void> {
+  const { data: maman } = await db()
+    .from("membres")
+    .select("id")
+    .eq("role", "maman")
+    .maybeSingle();
+
+  if (!maman) return;
+
+  await db()
+    .from("messages")
+    .update({ lu_le: new Date().toISOString() })
+    .eq("auteur_id", maman.id)
+    .is("lu_le", null);
 }

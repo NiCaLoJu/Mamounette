@@ -69,7 +69,12 @@ async function envoyerA(membreId: string, titre: string, corps: string, url = "/
  * Vers maman, avec les garde-fous : interrupteur global et plafond quotidien.
  * Le pire scénario pour ce projet, c'est une app qui devient bruyante.
  */
-export async function notifierMaman(titre: string, corps: string, url = "/") {
+export async function notifierMaman(
+  titre: string,
+  corps: string,
+  url = "/",
+  options: { plafond?: boolean } = {},
+) {
   const { data: reglages } = await db().from("reglages").select("*").maybeSingle();
   if (!reglages?.notifications_actives) return;
 
@@ -81,14 +86,18 @@ export async function notifierMaman(titre: string, corps: string, url = "/") {
 
   if (!maman) return;
 
-  const { count } = await db()
-    .from("notifications_log")
-    .select("id", { count: "exact", head: true })
-    .eq("membre_id", maman.id)
-    .eq("succes", true)
-    .gte("envoye_le", `${aujourdhui()}T00:00:00`);
+  // Le plafond bride les envois automatiques. Une réponse d'un de ses fils à
+  // un message qu'elle vient d'écrire passe toujours.
+  if (options.plafond !== false) {
+    const { count } = await db()
+      .from("notifications_log")
+      .select("id", { count: "exact", head: true })
+      .eq("membre_id", maman.id)
+      .eq("succes", true)
+      .gte("envoye_le", `${aujourdhui()}T00:00:00`);
 
-  if ((count ?? 0) >= (reglages.max_notifs_par_jour as number)) return;
+    if ((count ?? 0) >= (reglages.max_notifs_par_jour as number)) return;
+  }
 
   await envoyerA(maman.id as string, titre, corps, url);
 }
