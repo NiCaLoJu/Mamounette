@@ -7,7 +7,7 @@ rendez-vous, une case à la fois.
 Deux espaces, une seule application :
 
 - **Côté maman** — la journée du jour en cases à ouvrir, le fil de discussion,
-  la pioche, ses trésors, ses bons pour…, la boîte à projets. Elle peut
+  la pioche, ses petits bonheurs, ses bons pour…, la boîte à projets. Elle peut
   répondre sous chaque capsule ou écrire quand elle veut, au clavier ou à la
   voix.
 - **Côté admin** (Nicolas, Foufou, Loulou, et Namou s'il le souhaite) — déposer

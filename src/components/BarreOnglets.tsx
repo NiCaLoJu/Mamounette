@@ -7,7 +7,8 @@ const ONGLETS = [
   { href: "/", libelle: "Aujourd'hui", emoji: "💌" },
   { href: "/fil", libelle: "Le fil", emoji: "💬" },
   { href: "/pioche", libelle: "Pioche", emoji: "🎁" },
-  { href: "/tresors", libelle: "Mes trésors", emoji: "💎" },
+  // Le libellé est raccourci pour tenir dans la barre ; la page porte son nom entier.
+  { href: "/bonheurs", libelle: "Bonheurs", emoji: "🧡" },
   { href: "/bons", libelle: "Bons", emoji: "🎟️" },
   { href: "/projets", libelle: "Projets", emoji: "🌍" },
 ];

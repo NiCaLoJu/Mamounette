@@ -5,7 +5,7 @@ import { avecAlpha } from "@/lib/couleur";
 
 export const dynamic = "force-dynamic";
 
-export default async function Tresors() {
+export default async function Bonheurs() {
   const [etapes, ouvertes] = await Promise.all([frise(), capsulesOuvertes(60)]);
   const jour = aujourdhui();
   const franchies = etapes.filter((e) => ecartJours(jour, e.date) <= 0).length;
@@ -13,7 +13,7 @@ export default async function Tresors() {
   return (
     <main className="px-4 pt-8">
       <header className="mb-6">
-        <h1 className="titre text-rose text-3xl">Mes trésors</h1>
+        <h1 className="titre text-rose text-3xl">Mes petits bonheurs</h1>
         <p className="mt-1">
           {franchies > 0
             ? `${franchies} étoile${franchies > 1 ? "s" : ""} déjà gagnée${franchies > 1 ? "s" : ""} ✨`
