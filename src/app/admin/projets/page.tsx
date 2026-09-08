@@ -1,7 +1,7 @@
 import FormulaireProjet from "@/components/FormulaireProjet";
 import EnteteSection from "@/components/EnteteSection";
 import { projets } from "@/lib/donnees";
-import { compteARebours, intervalleEnLettres } from "@/lib/dates";
+import ListeProjetsAdmin from "@/components/ListeProjetsAdmin";
 
 export const dynamic = "force-dynamic";
 
@@ -19,24 +19,7 @@ export default async function ProjetsAdmin() {
 
       <FormulaireProjet />
 
-      <ul className="flex flex-col gap-2">
-        {liste.map((projet) => (
-          <li
-            key={projet.id}
-            className="border-bordure flex items-center gap-3 rounded-2xl border bg-white px-3 py-2.5"
-          >
-            <span className="flex flex-1 flex-col">
-              <span className="text-sm font-medium">{projet.titre}</span>
-              <span className="text-encre-douce text-xs">
-                {projet.auteur?.prenom}
-                {projet.debut &&
-                  ` · ${intervalleEnLettres(projet.debut, projet.fin)} · ${compteARebours(projet.debut, projet.fin).libelle}`}
-                {projet.envie && " · elle a dit oh oui 💛"}
-              </span>
-            </span>
-          </li>
-        ))}
-      </ul>
+      <ListeProjetsAdmin projets={liste} />
     </main>
   );
 }

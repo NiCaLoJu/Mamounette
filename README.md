@@ -150,6 +150,8 @@ src/
     (maman)/          son application : aujourd'hui, pioche, chemin, bons, projets
     admin/            le tableau de bord des garçons
     admin/capsules/   la bibliothèque : relire, corriger, déplacer, supprimer
+    admin/projets/    les projets datés, corrigeables et supprimables
+    admin/bons/       les bons, corrigeables, à honorer ou à remettre en jeu
     admin/temoignages/ les triples témoignages à compléter à trois
     admin/fil/        la conversation avec elle
     api/taches/       la tâche planifiée (publication, filet, rappels)

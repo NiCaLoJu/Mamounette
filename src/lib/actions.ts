@@ -512,3 +512,107 @@ export async function ecrire(formulaire: FormData) {
   revalidatePath("/admin");
 }
 
+
+// ---------------------------------------------------------------------------
+// Corriger et retirer : les projets et les bons
+// ---------------------------------------------------------------------------
+
+export async function modifierProjet(formulaire: FormData) {
+  await exigerEnfant();
+
+  const id = formulaire.get("id") as string;
+  if (!id) throw new Error("Projet introuvable.");
+
+  const { data: existant } = await db()
+    .from("projets")
+    .select("media_chemin")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (!existant) throw new Error("Projet introuvable.");
+
+  const nouveauMedia = (formulaire.get("media_chemin") as string) || null;
+  if (nouveauMedia && existant.media_chemin) {
+    await db().storage.from("media").remove([existant.media_chemin as string]);
+  }
+
+  const debut = (formulaire.get("debut") as string) || null;
+
+  const { error } = await db()
+    .from("projets")
+    .update({
+      titre: formulaire.get("titre") as string,
+      description: (formulaire.get("description") as string) || null,
+      ...(nouveauMedia ? { media_chemin: nouveauMedia } : {}),
+      debut,
+      fin: debut ? (formulaire.get("fin") as string) || null : null,
+    })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin/projets");
+  revalidatePath("/projets");
+  revalidatePath("/");
+}
+
+export async function supprimerProjet(id: string) {
+  await exigerEnfant();
+
+  const { data: projet } = await db()
+    .from("projets")
+    .select("media_chemin")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (projet?.media_chemin) {
+    await db().storage.from("media").remove([projet.media_chemin as string]);
+  }
+
+  await db().from("projets").delete().eq("id", id);
+
+  revalidatePath("/admin/projets");
+  revalidatePath("/projets");
+  revalidatePath("/");
+}
+
+export async function modifierBon(formulaire: FormData) {
+  await exigerEnfant();
+
+  const id = formulaire.get("id") as string;
+  if (!id) throw new Error("Bon introuvable.");
+
+  const { error } = await db()
+    .from("bons")
+    .update({
+      titre: formulaire.get("titre") as string,
+      description: (formulaire.get("description") as string) || null,
+    })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin/bons");
+  revalidatePath("/bons");
+}
+
+export async function supprimerBon(id: string) {
+  await exigerEnfant();
+  await db().from("bons").delete().eq("id", id);
+
+  revalidatePath("/admin/bons");
+  revalidatePath("/bons");
+}
+
+/** Remettre un bon en jeu — marqué fait par erreur, ou offert une seconde fois. */
+export async function rouvrirBon(id: string) {
+  await exigerEnfant();
+
+  await db()
+    .from("bons")
+    .update({ etat: "disponible", reclame_le: null, honore_le: null })
+    .eq("id", id);
+
+  revalidatePath("/admin/bons");
+  revalidatePath("/bons");
+}

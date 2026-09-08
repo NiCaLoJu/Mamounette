@@ -2,13 +2,20 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { creerProjet } from "@/lib/actions";
+import { creerProjet, modifierProjet } from "@/lib/actions";
 import { compresser } from "@/lib/image";
 import { envoyerFichier } from "@/lib/envoi";
+import type { Projet } from "@/lib/types";
 
-/** Une idée pour plus tard — avec une photo, ça devient concret. */
-export default function FormulaireProjet() {
+type ProjetModifiable = Projet & { media_url?: string | null };
+
+/**
+ * Une idée pour plus tard — avec une photo, ça devient concret.
+ * Le même formulaire sert à créer et à corriger.
+ */
+export default function FormulaireProjet({ projet }: { projet?: ProjetModifiable }) {
   const router = useRouter();
+  const modification = Boolean(projet);
   const [fichier, setFichier] = useState<File | null>(null);
   const [etape, setEtape] = useState<string | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
@@ -21,6 +28,7 @@ export default function FormulaireProjet() {
     setErreur(null);
 
     const formulaire = new FormData(evenement.currentTarget);
+    if (projet) formulaire.set("id", projet.id);
 
     if (fichier) {
       try {
@@ -37,7 +45,8 @@ export default function FormulaireProjet() {
 
     demarrer(async () => {
       try {
-        await creerProjet(formulaire);
+        if (modification) await modifierProjet(formulaire);
+        else await creerProjet(formulaire);
         setEtape(null);
         setFichier(null);
         router.refresh();
@@ -56,10 +65,17 @@ export default function FormulaireProjet() {
       <input
         name="titre"
         required
+        defaultValue={projet?.titre ?? ""}
         placeholder="Un week-end tous ensemble en Bretagne"
         className={champ}
       />
-      <textarea name="description" rows={3} placeholder="Ce qu'on ferait…" className={champ} />
+      <textarea
+        name="description"
+        rows={3}
+        defaultValue={projet?.description ?? ""}
+        placeholder="Ce qu'on ferait…"
+        className={champ}
+      />
 
       {/* Une date transforme une envie en cap : elle verra le compte à rebours. */}
       <fieldset className="border-bordure rounded-2xl border p-3">
@@ -69,17 +85,27 @@ export default function FormulaireProjet() {
         <div className="mt-2 flex flex-col gap-2">
           <label className="flex items-center gap-2 text-sm">
             <span className="text-encre-douce w-14 shrink-0">Du</span>
-            <input type="date" name="debut" className={champ} />
+            <input type="date" name="debut" defaultValue={projet?.debut ?? ""} className={champ} />
           </label>
           <label className="flex items-center gap-2 text-sm">
             <span className="text-encre-douce w-14 shrink-0">Au</span>
-            <input type="date" name="fin" className={champ} />
+            <input type="date" name="fin" defaultValue={projet?.fin ?? ""} className={champ} />
           </label>
           <p className="text-encre-douce text-xs">
             Laisse « Au » vide pour une seule journée.
           </p>
         </div>
       </fieldset>
+      {projet?.media_url && (
+        <div className="flex flex-col gap-1.5">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={projet.media_url} alt="" className="h-32 w-full rounded-2xl object-cover" />
+          <span className="text-encre-douce text-xs">
+            Choisis une nouvelle photo pour la remplacer, ou laisse vide.
+          </span>
+        </div>
+      )}
+
       <input
         type="file"
         accept="image/*,.heic,.heif"
@@ -94,7 +120,7 @@ export default function FormulaireProjet() {
         disabled={enCours || etape !== null}
         className="bg-rose rounded-full py-2.5 text-sm text-white disabled:opacity-60"
       >
-        {etape ?? "Ajouter le projet"}
+        {etape ?? (modification ? "Enregistrer" : "Ajouter le projet")}
       </button>
     </form>
   );
