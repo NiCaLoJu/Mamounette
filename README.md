@@ -34,6 +34,9 @@ journée, et elles n'apparaissent jamais de son côté.
 - **Les rubriques vides n'existent pas.** Chez elle, un onglet n'apparaît que
   lorsqu'il a quelque chose à montrer. Une icône qui n'ouvre sur rien est une
   petite déception, et elles seront nombreuses au démarrage.
+- **Le seul compte à rebours de l'application va vers quelque chose d'agréable.**
+  Un projet peut porter une date ou un intervalle — un week-end, une semaine —
+  et son approche s'affiche chez elle. Rien d'autre n'est jamais décompté.
 - **Le plafond de notifications.** Une par jour pour elle, au maximum. Une
   application qui devient bruyante est une application qu'on désinstalle. Seule
   exception : la réponse d'un de ses fils à un message qu'elle vient d'écrire
@@ -54,6 +57,7 @@ Créer un projet (région Europe), puis exécuter dans l'éditeur SQL, dans l'or
 | `supabase/migrations/0005_media.sql` | les formats de fichiers que produisent les téléphones |
 | `supabase/migrations/0006_temoignages.sql` | le triple témoignage collaboratif |
 | `supabase/migrations/0007_messages.sql` | la conversation dans les deux sens |
+| `supabase/migrations/0008_projets_dates.sql` | les dates de projets et leur compte à rebours |
 
 Récupérer ensuite les liens d'accès :
 

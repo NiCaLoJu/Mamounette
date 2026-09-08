@@ -357,11 +357,16 @@ export async function honorerBon(id: string) {
 export async function creerProjet(formulaire: FormData) {
   const auteur = await exigerEnfant();
 
+  const debut = (formulaire.get("debut") as string) || null;
+
   await db().from("projets").insert({
     auteur_id: auteur.id,
     titre: formulaire.get("titre") as string,
     description: (formulaire.get("description") as string) || null,
     media_chemin: (formulaire.get("media_chemin") as string) || null,
+    debut,
+    // Une fin sans début n'aurait pas de sens.
+    fin: debut ? (formulaire.get("fin") as string) || null : null,
   });
 
   revalidatePath("/admin/projets");

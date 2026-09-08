@@ -1,6 +1,7 @@
 import CaseAvent from "@/components/CaseAvent";
 import Notifications from "@/components/Notifications";
 import SignatureFamille from "@/components/SignatureFamille";
+import CapProchain from "@/components/CapProchain";
 import { capsulesDuJour, rendezVousDuJour, tailleReserve } from "@/lib/donnees";
 import { enLettres, aujourdhui } from "@/lib/dates";
 import { exigerMembre } from "@/lib/auth";
@@ -35,6 +36,8 @@ export default async function Aujourdhui() {
       </header>
 
       <Notifications />
+
+      <CapProchain />
 
       {capsules.length > 0 && <SignatureFamille />}
 

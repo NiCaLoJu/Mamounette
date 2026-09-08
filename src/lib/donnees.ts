@@ -147,6 +147,7 @@ export async function projets(): Promise<
   const { data } = await db()
     .from("projets")
     .select("*, auteur:membres(prenom, couleur)")
+    .order("debut", { ascending: true, nullsFirst: false })
     .order("cree_le", { ascending: false });
 
   return Promise.all(
@@ -416,4 +417,19 @@ export async function ongletsGarnis(): Promise<Record<string, boolean>> {
     "/bons": lesBons,
     "/projets": lesProjets,
   };
+}
+
+/** Le prochain projet daté — celui qui sert de cap sur l'accueil. */
+export async function prochainProjet(): Promise<
+  (Projet & { auteur: Auteur | null }) | null
+> {
+  const { data } = await db()
+    .from("projets")
+    .select("*, auteur:membres(prenom, couleur)")
+    .gte("debut", aujourdhui())
+    .order("debut", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  return (data as (Projet & { auteur: Auteur | null })) ?? null;
 }

@@ -5,6 +5,7 @@ import { marquerEnvie } from "@/lib/actions";
 import type { Projet } from "@/lib/types";
 import type { Auteur } from "@/lib/donnees";
 import { avecAlpha } from "@/lib/couleur";
+import { compteARebours, intervalleEnLettres } from "@/lib/dates";
 
 type ProjetAffiche = Projet & { auteur: Auteur | null; media_url: string | null };
 
@@ -33,6 +34,8 @@ export default function ListeProjets({ projets }: { projets: ProjetAffiche[] }) 
           )}
 
           <div className="p-4">
+            {projet.debut && <Rebours debut={projet.debut} fin={projet.fin} />}
+
             <div className="mb-1 flex items-baseline justify-between gap-2">
               <h3 className="titre text-lg">{projet.titre}</h3>
               {projet.auteur && (
@@ -61,5 +64,42 @@ export default function ListeProjets({ projets }: { projets: ProjetAffiche[] }) 
         </li>
       ))}
     </ul>
+  );
+}
+
+/**
+ * Le compte à rebours d'un projet daté. La jauge se remplit à mesure qu'on
+ * s'approche — sur les deux derniers mois, pour que le progrès soit visible
+ * même quand la date est encore loin.
+ */
+function Rebours({ debut, fin }: { debut: string; fin: string | null }) {
+  const rebours = compteARebours(debut, fin);
+  const avancement = Math.max(0, Math.min(100, ((60 - rebours.jours) / 60) * 100));
+
+  const fonds = {
+    attente: "linear-gradient(135deg, #f0c15c, #e08aa4)",
+    maintenant: "linear-gradient(135deg, #57a773, #2f8f5b)",
+    passe: "linear-gradient(135deg, #cfc6cb, #b3a8ae)",
+  } as const;
+
+  return (
+    <div className="mb-3">
+      <div
+        className="flex items-baseline justify-between gap-2 rounded-2xl px-3 py-2 text-white"
+        style={{ background: fonds[rebours.etat] }}
+      >
+        <span className="titre text-lg">{rebours.libelle}</span>
+        <span className="text-xs opacity-90">{intervalleEnLettres(debut, fin)}</span>
+      </div>
+
+      {rebours.etat === "attente" && (
+        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-black/5">
+          <div
+            className="h-full rounded-full transition-all"
+            style={{ width: `${avancement}%`, background: fonds.attente }}
+          />
+        </div>
+      )}
+    </div>
   );
 }

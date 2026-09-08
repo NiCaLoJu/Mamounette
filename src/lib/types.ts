@@ -67,6 +67,8 @@ export type Projet = {
   description: string | null;
   media_chemin: string | null;
   envie: boolean;
+  debut: string | null;
+  fin: string | null;
 };
 
 /** Libellés affichés pour chaque type de capsule. */

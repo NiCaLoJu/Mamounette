@@ -1,6 +1,7 @@
 import FormulaireProjet from "@/components/FormulaireProjet";
 import EnteteSection from "@/components/EnteteSection";
 import { projets } from "@/lib/donnees";
+import { compteARebours, intervalleEnLettres } from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +29,8 @@ export default async function ProjetsAdmin() {
               <span className="text-sm font-medium">{projet.titre}</span>
               <span className="text-encre-douce text-xs">
                 {projet.auteur?.prenom}
+                {projet.debut &&
+                  ` · ${intervalleEnLettres(projet.debut, projet.fin)} · ${compteARebours(projet.debut, projet.fin).libelle}`}
                 {projet.envie && " · elle a dit oh oui 💛"}
               </span>
             </span>

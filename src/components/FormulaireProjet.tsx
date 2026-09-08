@@ -60,6 +60,26 @@ export default function FormulaireProjet() {
         className={champ}
       />
       <textarea name="description" rows={3} placeholder="Ce qu'on ferait…" className={champ} />
+
+      {/* Une date transforme une envie en cap : elle verra le compte à rebours. */}
+      <fieldset className="border-bordure rounded-2xl border p-3">
+        <legend className="text-encre-douce px-1 text-sm">
+          Une date ? <em>— facultatif, mais c'est ce qui fait le compte à rebours</em>
+        </legend>
+        <div className="mt-2 flex flex-col gap-2">
+          <label className="flex items-center gap-2 text-sm">
+            <span className="text-encre-douce w-14 shrink-0">Du</span>
+            <input type="date" name="debut" className={champ} />
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <span className="text-encre-douce w-14 shrink-0">Au</span>
+            <input type="date" name="fin" className={champ} />
+          </label>
+          <p className="text-encre-douce text-xs">
+            Laisse « Au » vide pour une seule journée.
+          </p>
+        </div>
+      </fieldset>
       <input
         type="file"
         accept="image/*,.heic,.heif"
